@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMAR Social Hub - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #0b0f19; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        .neon-glow { box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
+
+    <!-- PIN Authentication Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+        <div class="glass-card rounded-2xl p-6 w-full max-w-sm text-center space-y-4">
+            <div class="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400 w-12 h-12 mx-auto flex items-center justify-center">
+                <i class="fas fa-lock text-xl"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white">Admin Access</h2>
+            <p class="text-xs text-gray-400">Enter Admin PIN (Default: 778899)</p>
+            <form id="loginForm" class="space-y-3">
+                <input type="password" id="pinInput" maxlength="6" placeholder="Enter PIN"
+                    class="w-full bg-gray-900/80 border border-gray-700 focus:border-cyan-500 rounded-xl px-4 py-3 text-center text-xl font-mono tracking-widest text-cyan-300 outline-none">
+                <div id="loginError" class="hidden text-red-400 text-xs">Incorrect PIN. Try again.</div>
+                <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 text-white font-bold py-3 rounded-xl shadow-lg neon-glow transition">
+                    UNLOCK DASHBOARD
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Admin View -->
+    <div class="max-w-4xl mx-auto w-full space-y-6 flex-grow">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center glass-card p-4 rounded-2xl gap-4">
+            <div>
+                <span class="px-3 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-full text-xs font-semibold">
+                    <i class="fas fa-shield-alt mr-1"></i> ADMIN CONTROL PANEL
+                </span>
+                <h1 class="text-2xl font-extrabold text-white mt-1">AMAR Social Hub</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="fetchOTPs()" class="px-4 py-2 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-xl hover:bg-cyan-500/20 text-xs font-bold transition flex items-center gap-2">
+                    <i class="fas fa-sync-alt" id="syncIcon"></i> Refresh Data
+                </button>
+                <button onclick="logoutAdmin()" class="px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl hover:bg-red-500/20 text-xs font-bold transition">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Admin System Console -->
+        <div class="glass-card rounded-xl p-3 border border-cyan-500/25 text-xs font-mono">
+            <div class="flex justify-between items-center mb-1.5 pb-1 border-b border-gray-800">
+                <span class="text-cyan-400 font-bold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ADMIN LOG CONSOLE
+                </span>
+                <button onclick="clearLogs()" class="text-gray-500 hover:text-gray-300 text-[10px]">Clear</button>
+            </div>
+            <div id="logContainer" class="space-y-1 max-h-24 overflow-y-auto text-[11px] text-gray-300 pr-1">
+                <div class="text-emerald-400">[System] Admin Panel Initialized.</div>
+            </div>
+        </div>
+
+        <!-- OTP Records List -->
+        <div class="glass-card rounded-2xl p-6">
+            <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <i class="fas fa-list-ul text-cyan-400"></i> Live Incoming OTP Codes
+            </h2>
+
+            <div id="otpListContainer" class="space-y-3">
+                <div class="text-center py-8 text-gray-500 text-sm">
+                    Authenticate to view live codes.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-center text-xs text-gray-500 py-4">&copy; 2026 AMAR Social Hub. All rights reserved.</div>
+
+    <script>
+        function addLog(msg, type = 'info') {
+            const box = document.getElementById('logContainer');
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = type === 'error' ? 'text-red-400 font-bold' : (type === 'success' ? 'text-emerald-400' : 'text-gray-300');
+            div.innerHTML = `[${time}] ${msg}`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('logContainer').innerHTML = '';
+        }
+
+        const PROJECT_ID = "amar-d755e";
+        const RTDB_URL = `https://${PROJECT_ID}-default-rtdb.firebaseio.com/otps.json`;
+        const CORRECT_PIN = "778899";
+
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const pinInput = document.getElementById('pinInput');
+        const loginError = document.getElementById('loginError');
+
+        if (sessionStorage.getItem('adminAuth') === 'true') {
+            loginModal.classList.add('hidden');
+            addLog("Authenticated session restored.", "success");
+            fetchOTPs();
+            setInterval(fetchOTPs, 5000);
+        }
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (pinInput.value.trim() === CORRECT_PIN) {
+                sessionStorage.setItem('adminAuth', 'true');
+                loginModal.classList.add('hidden');
+                addLog("Login successful!", "success");
+                fetchOTPs();
+                setInterval(fetchOTPs, 5000);
+            } else {
+                loginError.classList.remove('hidden');
+                addLog("Incorrect PIN attempt.", "error");
+            }
+        });
+
+        function logoutAdmin() {
+            sessionStorage.removeItem('adminAuth');
+            loginModal.classList.remove('hidden');
+            pinInput.value = '';
+            addLog("Admin logged out.", "warn");
+        }
+
+        async function fetchOTPs() {
+            if (sessionStorage.getItem('adminAuth') !== 'true') return;
+
+            const syncIcon = document.getElementById('syncIcon');
+            syncIcon.classList.add('fa-spin');
+
+            try {
+                const response = await fetch(RTDB_URL);
+                const data = await response.json();
+
+                const container = document.getElementById('otpListContainer');
+                container.innerHTML = '';
+
+                if (!data) {
+                    container.innerHTML = '<div class="text-center py-8 text-gray-500 text-sm">No OTP codes received yet.</div>';
+                    addLog("Database is currently empty.", "info");
+                    syncIcon.classList.remove('fa-spin');
+                    return;
+                }
+
+                const otpsArray = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                })).reverse();
+
+                addLog(`Fetched ${otpsArray.length} OTP record(s).`, "success");
+
+                otpsArray.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = "bg-gray-900/60 border border-gray-800 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-cyan-500/40 transition";
+                    
+                    card.innerHTML = `
+                        <div class="space-y-1 font-mono">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs px-2 py-0.5 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded">Session: ${item.sessionId || 'N/A'}</span>
+                                <span class="text-[10px] text-gray-500">${item.createdAt ? new Date(item.createdAt).toLocaleTimeString() : ''}</span>
+                            </div>
+                            <div class="text-2xl font-bold text-white tracking-wider text-cyan-300">
+                                ${item.otp}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                            <button onclick="copyOTP('${item.otp}')" class="px-3 py-2 bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500/20 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <button onclick="deleteOTP('${item.id}')" class="px-3 py-2 bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error("Fetch error:", err);
+                addLog("Fetch error: " + err.message, "error");
+            } finally {
+                syncIcon.classList.remove('fa-spin');
+            }
+        }
+
+        function copyOTP(code) {
+            navigator.clipboard.writeText(code);
+            addLog(`Copied OTP: ${code}`, "success");
+            alert("OTP Copied: " + code);
+        }
+
+        async function deleteOTP(id) {
+            if (!confirm("Delete this OTP record?")) return;
+
+            const deleteURL = `https://${PROJECT_ID}-default-rtdb.firebaseio.com/otps/${id}.json`;
+            addLog(`Deleting record ${id}...`, "info");
+
+            try {
+                const response = await fetch(deleteURL, { method: 'DELETE' });
+                if (response.ok) {
+                    addLog("Record deleted.", "success");
+                    fetchOTPs();
+                } else {
+                    throw new Error("Failed to delete.");
+                }
+            } catch (err) {
+                addLog("Delete error: " + err.message, "error");
+            }
+        }
+    </script>
+</body>
+</html>
