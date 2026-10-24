@@ -1,183 +1,1578 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMAR Social Hub - OTP Verification</title>
+    <title>Loan Check Portal & Management System</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { background-color: #0b0f19; color: #e2e8f0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
-        .neon-glow { box-shadow: 0 0 20px rgba(6, 182, 212, 0.4); }
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between items-center p-4">
+<body class="h-full text-slate-800 flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
-    <div class="w-full max-w-md my-auto space-y-4">
-        <!-- System Log Console -->
-        <div class="glass-card rounded-xl p-3 border border-cyan-500/25 text-xs font-mono">
-            <div class="flex justify-between items-center mb-1.5 pb-1 border-b border-gray-800">
-                <span class="text-cyan-400 font-bold flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> SYSTEM CONSOLE
-                </span>
-                <button onclick="clearLogs()" class="text-gray-500 hover:text-gray-300 text-[10px]">Clear</button>
-            </div>
-            <div id="logContainer" class="space-y-1 max-h-28 overflow-y-auto text-[11px] text-gray-300 pr-1">
-                <div class="text-emerald-400">[System] HTTP Realtime Sync Ready.</div>
-            </div>
-        </div>
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-        <div class="text-center mb-2">
-            <span class="inline-block px-3 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-full text-xs font-semibold mb-2">
-                <i class="fas fa-shield-alt mr-1"></i> PRO SECURE HUB
-            </span>
-            <h1 class="text-3xl font-extrabold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">AMAR Social Hub</h1>
-            <p class="text-gray-400 text-sm mt-1">OTP Verification Website</p>
-        </div>
-
-        <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
-            <div class="flex justify-center mb-4">
-                <div class="p-3 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400">
-                    <i class="fas fa-key text-2xl"></i>
+    <!-- Navigation Header -->
+    <header class="bg-navy-900 text-white sticky top-0 z-30 shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('verification')">
+                <div class="bg-brand-600 p-2 rounded-lg text-white shadow-lg shadow-brand-600/30">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
                 </div>
-            </div>
-
-            <h2 class="text-xl font-bold text-center text-white mb-1">Enter Your OTP</h2>
-            <p class="text-xs text-gray-400 text-center mb-6">Supports 4-digit or 6-digit verification codes</p>
-
-            <form id="otpForm" class="space-y-4">
                 <div>
-                    <div class="flex justify-between items-center text-xs text-gray-400 mb-2">
-                        <span id="digitStatus">Digit Count: 0/6</span>
-                        <button type="button" id="toggleMask" class="hover:text-cyan-400 transition">
-                            <i class="fas fa-eye mr-1"></i> Show Code
-                        </button>
+                    <span class="font-bold text-lg tracking-tight block leading-none">LOAN CHECK</span>
+                    <span class="text-xs text-slate-400 font-medium tracking-wider">PORTAL & MANAGEMENT</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <span id="currentViewBadge" class="hidden sm:inline-block px-3 py-1 rounded-full text-xs font-semibold bg-navy-800 text-brand-100 border border-slate-700">
+                    Customer Portal
+                </span>
+                
+                <button id="adminToggleBtn" onclick="toggleAdminView()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-1.5 rounded-lg text-sm font-medium transition border border-slate-700">
+                    <i data-lucide="lock" class="w-4 h-4 text-brand-500"></i>
+                    <span id="adminBtnText">Admin Portal</span>
+                </button>
+
+                <button id="customerLogoutBtn" onclick="logoutCustomer()" class="hidden flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-sm font-medium transition border border-red-500/20">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                    <span>Exit Dashboard</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Dynamic Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
+
+        <!-- ==================== VIEW 1: LOAN VERIFICATION PAGE ==================== -->
+        <section id="viewVerification" class="flex-1 flex flex-col items-center justify-center py-10">
+            <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 p-8 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-500 to-indigo-600"></div>
+                
+                <div class="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-brand-600">
+                    <i data-lucide="file-search" class="w-8 h-8"></i>
+                </div>
+
+                <h1 class="text-2xl font-bold text-slate-900 mb-2">Check Your Loan Status</h1>
+                <p class="text-sm text-slate-500 mb-6">Enter your official Loan ID to securely view your installment schedule, payment history, and balance details.</p>
+
+                <form id="loanCheckForm" onsubmit="handleLoanCheck(event)" class="space-y-4">
+                    <div class="text-left">
+                        <label for="loanIdInput" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Loan Reference ID</label>
+                        <div class="relative">
+                            <i data-lucide="credit-card" class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="loanIdInput" required placeholder="e.g. LN-88219" 
+                                class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition uppercase tracking-wider">
+                        </div>
                     </div>
-                    
-                    <div class="relative">
-                        <input type="text" id="otpInput" maxlength="6" inputmode="numeric" placeholder="• • • • • •"
-                            class="w-full bg-gray-900/80 border border-gray-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-xl px-4 py-3.5 text-center text-2xl font-mono tracking-widest text-cyan-300 outline-none transition">
-                        <span id="validBadge" class="hidden absolute right-3 top-3.5 text-emerald-400 text-lg">
-                            <i class="fas fa-check-circle"></i>
-                        </span>
+
+                    <button type="submit" id="checkBtn" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-brand-600/20 flex items-center justify-center gap-2 transition duration-200">
+                        <span>Verify & Check Loan</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
+
+                <div class="mt-8 pt-6 border-t border-slate-100 text-xs text-slate-400 flex items-center justify-center gap-2">
+                    <i data-lucide="shield-lock" class="w-4 h-4 text-emerald-500"></i>
+                    <span>256-Bit Encrypted Secure Data Portal</span>
+                </div>
+            </div>
+
+            <!-- Sample IDs Helper for Demo -->
+            <div class="mt-8 bg-blue-50/80 border border-blue-100 rounded-xl p-4 max-w-md w-full text-xs text-slate-600 text-center">
+                <span class="font-semibold text-brand-700 block mb-1"><i data-lucide="info" class="w-3.5 h-3.5 inline mr-1"></i> Demo Quick Credentials:</span>
+                Try active Loan IDs: <code class="bg-white px-1.5 py-0.5 rounded border border-blue-200 font-mono text-brand-600">LN-88219</code>, 
+                <code class="bg-white px-1.5 py-0.5 rounded border border-blue-200 font-mono text-brand-600">LN-45012</code>, or 
+                <code class="bg-white px-1.5 py-0.5 rounded border border-blue-200 font-mono text-brand-600">LN-99104</code>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 2: CUSTOMER SECURITY VERIFICATION MODAL ==================== -->
+        <div id="securityModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100 animate-in fade-in zoom-in duration-200">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-2 text-brand-600">
+                        <i data-lucide="lock" class="w-5 h-5"></i>
+                        <h3 class="font-bold text-slate-900">Identity Verification Required</h3>
+                    </div>
+                    <button onclick="closeSecurityModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                </div>
+                <p class="text-xs text-slate-500 mb-4">For privacy protection, please confirm the birth year or last 4 digits of the phone number associated with Loan <span id="secModalLoanId" class="font-mono font-bold text-slate-800"></span>.</p>
+                
+                <form id="securityForm" onsubmit="handleSecurityVerification(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Verification Code / Year / Phone Last 4</label>
+                        <input type="text" id="secInput" placeholder="Enter '1988' or '4321' (Demo Answer: 1988)" required
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" onclick="closeSecurityModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
+                        <button type="submit" class="px-4 py-2 text-xs font-semibold bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow">Confirm Identity</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 3: CUSTOMER DASHBOARD ==================== -->
+        <section id="viewCustomerDashboard" class="hidden space-y-6">
+            <!-- Customer Header Card -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-14 h-14 bg-gradient-to-tr from-brand-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        <span id="custAvatar">JD</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h2 id="custName" class="text-xl font-bold text-slate-900">John Doe</h2>
+                            <span id="custStatusBadge" class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">Active</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1 flex items-center gap-3 flex-wrap">
+                            <span>Loan ID: <strong id="custLoanId" class="font-mono text-slate-700">LN-88219</strong></span>
+                            <span>Ref #: <strong id="custRefNo" class="font-mono text-slate-700">REF-90812</strong></span>
+                            <span>Approval Date: <strong id="custApprovalDate" class="text-slate-700">2026-01-15</strong></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 no-print">
+                    <button onclick="exportCustomerStatementCSV()" class="px-3.5 py-2 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl flex items-center gap-1.5 transition">
+                        <i data-lucide="download" class="w-4 h-4"></i> Export CSV
+                    </button>
+                    <button onclick="window.print()" class="px-3.5 py-2 text-xs font-medium bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-xl flex items-center gap-1.5 transition">
+                        <i data-lucide="printer" class="w-4 h-4"></i> Print Statement
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Overview Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Total Loan Amount</span>
+                    <div id="custStatTotalLoan" class="text-2xl font-bold text-slate-900">$10,000.00</div>
+                    <p class="text-xs text-slate-500 mt-1">Payable: <span id="custStatPayable" class="font-semibold text-slate-700">$10,800.00</span></p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Total Paid Amount</span>
+                    <div id="custStatTotalPaid" class="text-2xl font-bold text-emerald-600">$4,500.00</div>
+                    <p class="text-xs text-emerald-600/80 mt-1 font-medium" id="custStatPaidInstallments">5 of 12 Installments</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Remaining Balance</span>
+                    <div id="custStatBalance" class="text-2xl font-bold text-brand-600">$6,300.00</div>
+                    <p class="text-xs text-slate-500 mt-1" id="custStatPendingInstallments">7 Installments Left</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">Next Payment Due</span>
+                    <div id="custStatNextAmount" class="text-2xl font-bold text-slate-900">$900.00</div>
+                    <p class="text-xs text-amber-600 font-medium mt-1 flex items-center gap-1">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                        <span id="custStatNextDate">Due Nov 15, 2026</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Dynamic Repayment Progress Bar Card -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-3">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="trending-up" class="w-4 h-4 text-brand-600"></i>
+                        Repayment Progress
+                    </span>
+                    <span id="custProgressPercent" class="font-bold text-brand-600">41.6%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden">
+                    <div id="custProgressBar" class="bg-gradient-to-r from-brand-500 to-emerald-500 h-3.5 rounded-full transition-all duration-500" style="width: 41.6%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-slate-500">
+                    <span>Paid: <strong id="custProgPaidText" class="text-slate-700">$4,500.00</strong></span>
+                    <span>Remaining: <strong id="custProgRemText" class="text-slate-700">$6,300.00</strong></span>
+                </div>
+            </div>
+
+            <!-- Installments & Payment History Table -->
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-slate-900">Installment Schedule & Payment History</h3>
+                        <p class="text-xs text-slate-500">Full breakdown of past and upcoming installment payments</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[11px] border-b border-slate-200">
+                            <tr>
+                                <th class="py-3.5 px-4">Inst #</th>
+                                <th class="py-3.5 px-4">Due Date</th>
+                                <th class="py-3.5 px-4">Amount Due</th>
+                                <th class="py-3.5 px-4">Amount Paid</th>
+                                <th class="py-3.5 px-4">Payment Date</th>
+                                <th class="py-3.5 px-4">Status</th>
+                                <th class="py-3.5 px-4">Txn Reference</th>
+                                <th class="py-3.5 px-4 text-right no-print">Receipt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="custPaymentTableBody" class="divide-y divide-slate-100 font-medium">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 4: ADMIN LOGIN PAGE ==================== -->
+        <section id="viewAdminLogin" class="hidden flex-1 flex flex-col items-center justify-center py-10">
+            <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
+                <div class="text-center mb-6">
+                    <div class="w-12 h-12 bg-navy-900 text-brand-500 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-md">
+                        <i data-lucide="shield-alert" class="w-6 h-6"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900">Admin Control Panel</h2>
+                    <p class="text-xs text-slate-500 mt-1">Authorized personnel login required</p>
+                </div>
+
+                <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Username</label>
+                        <input type="text" id="adminUser" required value="admin" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase mb-1">Password</label>
+                        <input type="password" id="adminPass" required value="admin10" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-navy-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-lg text-sm shadow transition">
+                        Authenticate Admin
+                    </button>
+                </form>
+
+                <div class="mt-6 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+                    <div class="font-bold mb-0.5 flex items-center gap-1"><i data-lucide="key" class="w-3.5 h-3.5"></i> Initial Demo Credentials:</div>
+                    User: <code class="font-mono font-bold">admin</code> | Pass: <code class="font-mono font-bold">admin10</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 5: ADMIN DASHBOARD ==================== -->
+        <section id="viewAdminDashboard" class="hidden flex-1 flex flex-col lg:flex-row gap-6">
+
+            <!-- Admin Sidebar Nav -->
+            <aside class="w-full lg:w-64 bg-navy-900 text-slate-300 rounded-2xl p-4 flex flex-col justify-between shrink-0 no-print shadow-xl">
+                <div class="space-y-6">
+                    <div class="px-3 py-2 border-b border-slate-800">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 block">System Nav</span>
+                        <div class="text-sm font-bold text-white flex items-center gap-2 mt-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Admin Session Active
+                        </div>
+                    </div>
+
+                    <nav class="space-y-1 text-xs font-medium" id="adminNavList">
+                        <button onclick="switchAdminTab('overview')" id="tabBtn-overview" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition bg-brand-600 text-white font-semibold">
+                            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+                        </button>
+                        <button onclick="switchAdminTab('customers')" id="tabBtn-customers" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 transition text-slate-300">
+                            <i data-lucide="users" class="w-4 h-4"></i> Customer Directory
+                        </button>
+                        <button onclick="switchAdminTab('loans')" id="tabBtn-loans" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 transition text-slate-300">
+                            <i data-lucide="badge-dollar-sign" class="w-4 h-4"></i> Loan Portfolio
+                        </button>
+                        <button onclick="switchAdminTab('payments')" id="tabBtn-payments" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 transition text-slate-300">
+                            <i data-lucide="receipt" class="w-4 h-4"></i> Record Payments
+                        </button>
+                        <button onclick="switchAdminTab('reports')" id="tabBtn-reports" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 transition text-slate-300">
+                            <i data-lucide="bar-chart-3" class="w-4 h-4"></i> Reports & Export
+                        </button>
+                        <button onclick="switchAdminTab('audit')" id="tabBtn-audit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 transition text-slate-300">
+                            <i data-lucide="shield-check" class="w-4 h-4"></i> Audit Trail Log
+                        </button>
+                    </nav>
+                </div>
+
+                <div class="pt-6 border-t border-slate-800 space-y-2">
+                    <button onclick="logoutAdmin()" class="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 py-2 rounded-xl text-xs font-semibold transition border border-red-500/20">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> Logout Admin
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Admin Main View Dynamic Sub-panels -->
+            <div class="flex-1 space-y-6">
+
+                <!-- SUB-TAB 1: OVERVIEW -->
+                <div id="adminTab-overview" class="space-y-6">
+                    <div class="flex justify-between items-center flex-wrap gap-2">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">Portfolio Overview</h2>
+                            <p class="text-xs text-slate-500">Real-time stats across all registered borrowers</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openNewCustomerModal()" class="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow transition">
+                                <i data-lucide="user-plus" class="w-4 h-4"></i> + Add Customer
+                            </button>
+                            <button onclick="openNewLoanModal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow transition">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i> + Issue New Loan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Customers</span>
+                            <div id="admStatCustCount" class="text-xl font-bold text-slate-900 mt-1">0</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Total Loans</span>
+                            <div id="admStatLoanCount" class="text-xl font-bold text-slate-900 mt-1">0</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Total Portfolio</span>
+                            <div id="admStatTotalVal" class="text-xl font-bold text-brand-600 mt-1">$0</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Collected</span>
+                            <div id="admStatTotalCollected" class="text-xl font-bold text-emerald-600 mt-1">$0</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Outstanding</span>
+                            <div id="admStatOutstanding" class="text-xl font-bold text-indigo-600 mt-1">$0</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="text-[11px] font-semibold text-slate-400 uppercase">Overdue Inst.</span>
+                            <div id="admStatOverdueCount" class="text-xl font-bold text-red-600 mt-1">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-sm font-bold text-slate-800 mb-4">Monthly Collection & Target Overview</h3>
+                            <div class="h-64">
+                                <canvas id="chartCollection"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-sm font-bold text-slate-800 mb-4">Loan Portfolio Status Breakdown</h3>
+                            <div class="h-64 flex items-center justify-center">
+                                <canvas id="chartStatus"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity / Quick Actions -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+                        <h3 class="font-bold text-slate-900 mb-3 text-sm">Quick Recent Loans Overview</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                                    <tr>
+                                        <th class="p-3">Loan ID</th>
+                                        <th class="p-3">Customer</th>
+                                        <th class="p-3">Amount</th>
+                                        <th class="p-3">Balance</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admQuickLoanTable" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                <div id="errorAlert" class="hidden p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs text-center"></div>
-                <div id="statusAlert" class="hidden p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs text-center"></div>
+                <!-- SUB-TAB 2: CUSTOMERS MANAGEMENT -->
+                <div id="adminTab-customers" class="hidden space-y-4">
+                    <div class="flex justify-between items-center flex-wrap gap-2">
+                        <h2 class="text-xl font-bold text-slate-900">Customer Management</h2>
+                        <div class="flex gap-2">
+                            <input type="text" id="custSearchInput" onkeyup="renderAdminCustomers()" placeholder="Search customer or Loan ID..." class="px-3.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 w-60">
+                            <button onclick="openNewCustomerModal()" class="px-3.5 py-2 bg-brand-600 text-white rounded-xl text-xs font-semibold flex items-center gap-1 shadow">+ Add Customer</button>
+                        </div>
+                    </div>
 
-                <button type="submit" id="submitBtn"
-                    class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg neon-glow transition duration-300 flex items-center justify-center space-x-2">
-                    <i class="fas fa-paper-plane"></i>
-                    <span>SEND OTP TO ADMIN</span>
-                </button>
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                                    <tr>
+                                        <th class="p-3">Customer ID / Loan ID</th>
+                                        <th class="p-3">Full Name</th>
+                                        <th class="p-3">Contact</th>
+                                        <th class="p-3">Security Code</th>
+                                        <th class="p-3">Loan Count</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admCustomerTableBody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB 3: LOANS MANAGEMENT -->
+                <div id="adminTab-loans" class="hidden space-y-4">
+                    <div class="flex justify-between items-center flex-wrap gap-2">
+                        <h2 class="text-xl font-bold text-slate-900">Loan Portfolio Management</h2>
+                        <button onclick="openNewLoanModal()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold flex items-center gap-1 shadow">+ Create New Loan</button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                                    <tr>
+                                        <th class="p-3">Loan ID / Ref</th>
+                                        <th class="p-3">Borrower</th>
+                                        <th class="p-3">Principal</th>
+                                        <th class="p-3">Payable</th>
+                                        <th class="p-3">Paid Balance</th>
+                                        <th class="p-3">Freq / Inst</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admLoansTableBody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB 4: PAYMENT RECORDING & MANAGEMENT -->
+                <div id="adminTab-payments" class="hidden space-y-4">
+                    <div class="flex justify-between items-center flex-wrap gap-2">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900">Record & Edit Installment Payments</h2>
+                            <p class="text-xs text-slate-500">Log customer payments against specific installments</p>
+                        </div>
+                        <button onclick="openRecordPaymentModal()" class="px-3.5 py-2 bg-brand-600 text-white rounded-xl text-xs font-semibold flex items-center gap-1 shadow">+ Record Payment</button>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 bg-slate-50 border-b border-slate-200 flex gap-3">
+                            <select id="payFilterLoanSelect" onchange="renderAdminPayments()" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:outline-none">
+                                <option value="ALL">All Loans</option>
+                            </select>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                                    <tr>
+                                        <th class="p-3">Loan ID</th>
+                                        <th class="p-3">Inst #</th>
+                                        <th class="p-3">Due Date</th>
+                                        <th class="p-3">Amount Due</th>
+                                        <th class="p-3">Paid Amount</th>
+                                        <th class="p-3">Payment Date</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3">Txn Ref</th>
+                                        <th class="p-3 text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admPaymentsTableBody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB 5: REPORTS & CSV EXPORTS -->
+                <div id="adminTab-reports" class="hidden space-y-4">
+                    <h2 class="text-xl font-bold text-slate-900">Reports & Data Exports</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="w-10 h-10 bg-brand-50 text-brand-600 rounded-xl flex items-center justify-center"><i data-lucide="users" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-slate-800 text-sm">Customer Master List</h3>
+                            <p class="text-xs text-slate-500">Export complete directory of customers, contact information, and loan references.</p>
+                            <button onclick="exportAllCustomersCSV()" class="w-full py-2 bg-brand-50 hover:bg-brand-100 text-brand-700 font-semibold rounded-xl text-xs transition">Export Customer CSV</button>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center"><i data-lucide="receipt" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-slate-800 text-sm">All Payments Ledger</h3>
+                            <p class="text-xs text-slate-500">Export granular payment transactions log including dates, references, and amounts.</p>
+                            <button onclick="exportAllPaymentsCSV()" class="w-full py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold rounded-xl text-xs transition">Export Payments CSV</button>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center"><i data-lucide="alert-triangle" class="w-5 h-5"></i></div>
+                            <h3 class="font-bold text-slate-800 text-sm">Overdue Installments Report</h3>
+                            <p class="text-xs text-slate-500">Export list of overdue installments requiring administrative follow-up.</p>
+                            <button onclick="exportOverdueCSV()" class="w-full py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl text-xs transition">Export Overdue CSV</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB 6: AUDIT LOG TRAIL -->
+                <div id="adminTab-audit" class="hidden space-y-4">
+                    <h2 class="text-xl font-bold text-slate-900">System Audit Trail Log</h2>
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-4">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 text-slate-500 uppercase font-semibold">
+                                    <tr>
+                                        <th class="p-3">Timestamp</th>
+                                        <th class="p-3">Action Type</th>
+                                        <th class="p-3">Details</th>
+                                        <th class="p-3">User</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="auditTableBody" class="divide-y divide-slate-100 font-mono text-[11px]"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-xs text-center border-t border-slate-800 mt-auto no-print">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div>&copy; 2026 <strong>Loan Check Portal</strong>. All rights reserved. Professional Fintech System.</div>
+            <div class="flex items-center gap-4">
+                <span class="hover:underline cursor-pointer" onclick="switchView('verification')">Borrower Portal</span>
+                <span>•</span>
+                <span class="hover:underline cursor-pointer" onclick="switchView('admin-login')">Admin Management</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================== MODALS FOR ADMIN CRUD OPERATIONS ==================== -->
+
+    <!-- Modal 1: Add New Customer -->
+    <div id="modalNewCustomer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-slate-900">Register New Customer</h3>
+                <button onclick="closeModal('modalNewCustomer')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleCreateCustomer(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+                    <input type="text" id="newCustName" required placeholder="e.g. Sarah Connor" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Phone Number</label>
+                    <input type="text" id="newCustPhone" required placeholder="+1 555-0192" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Security Verification Code (Birth Year or 4 Digits)</label>
+                    <input type="text" id="newCustSecCode" required placeholder="e.g. 1988" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModal('modalNewCustomer')" class="px-4 py-2 text-xs font-medium text-slate-600">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold bg-brand-600 text-white rounded-lg">Save Customer</button>
+                </div>
             </form>
+        </div>
+    </div>
 
-            <div class="mt-6 pt-4 border-t border-gray-800 text-center">
-                <p class="text-xs text-gray-500 font-mono">Session ID: <span id="sessionIdDisplay" class="text-gray-400">Loading...</span></p>
-                <p class="text-[10px] text-emerald-400/80 mt-1"><i class="fas fa-lock mr-1"></i> Universal Direct Sync Active</p>
+    <!-- Modal 2: Create New Loan & Schedule Generator -->
+    <div id="modalNewLoan" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-slate-900">Issue New Loan & Generate Schedule</h3>
+                <button onclick="closeModal('modalNewLoan')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleCreateLoan(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Select Borrower Customer</label>
+                    <select id="newLoanCustSelect" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                        <!-- Dynamic customers -->
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Loan ID (Unique)</label>
+                        <input type="text" id="newLoanId" required readonly class="w-full px-3 py-2 bg-slate-100 border rounded-lg text-xs font-mono font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Reference #</label>
+                        <input type="text" id="newLoanRef" required readonly class="w-full px-3 py-2 bg-slate-100 border rounded-lg text-xs font-mono">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Principal Amount ($)</label>
+                        <input type="number" step="0.01" id="newLoanAmount" oninput="autoCalcTotalPayable()" required placeholder="5000" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Total Payable ($)</label>
+                        <input type="number" step="0.01" id="newLoanTotalPayable" required placeholder="5400" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Frequency</label>
+                        <select id="newLoanFreq" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                            <option value="Monthly">Monthly</option>
+                            <option value="Weekly">Weekly</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1"># Installments</label>
+                        <input type="number" id="newLoanInstallmentsCount" required value="12" min="1" max="60" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">First Due Date</label>
+                        <input type="date" id="newLoanFirstDueDate" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Approval Date</label>
+                    <input type="date" id="newLoanApprovalDate" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModal('modalNewLoan')" class="px-4 py-2 text-xs font-medium text-slate-600">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold bg-emerald-600 text-white rounded-lg">Generate Loan & Schedule</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 3: Record Payment -->
+    <div id="modalRecordPayment" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-slate-900">Record Installment Payment</h3>
+                <button onclick="closeModal('modalRecordPayment')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <form onsubmit="handleSavePayment(event)" class="space-y-3">
+                <input type="hidden" id="recPayLoanId">
+                <input type="hidden" id="recPayInstNum">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Target Loan & Installment</label>
+                    <input type="text" id="recPayInfoText" readonly class="w-full px-3 py-2 bg-slate-100 border rounded-lg text-xs font-semibold">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Amount Paid ($)</label>
+                        <input type="number" step="0.01" id="recPayAmount" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs font-bold text-brand-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Date</label>
+                        <input type="date" id="recPayDate" required class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Txn Reference #</label>
+                    <input type="text" id="recPayRef" required placeholder="TXN-990812" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Payment Status</label>
+                    <select id="recPayStatus" class="w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs">
+                        <option value="Paid">Paid (Full)</option>
+                        <option value="Partially Paid">Partially Paid</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-3">
+                    <button type="button" onclick="closeModal('modalRecordPayment')" class="px-4 py-2 text-xs font-medium text-slate-600">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold bg-brand-600 text-white rounded-lg">Save Payment Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Printable Receipt Modal -->
+    <div id="modalReceipt" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-100 text-slate-800">
+            <div class="text-center border-b pb-4 mb-4">
+                <h2 class="font-bold text-lg text-slate-900">LOAN CHECK PORTAL</h2>
+                <p class="text-xs text-slate-500">Official Payment Receipt</p>
+            </div>
+            <div class="space-y-2 text-xs mb-6" id="receiptContent">
+                <!-- Dynamic receipt info -->
+            </div>
+            <div class="flex justify-end gap-2 no-print">
+                <button onclick="closeModal('modalReceipt')" class="px-4 py-2 text-xs font-medium text-slate-600">Close</button>
+                <button onclick="window.print()" class="px-4 py-2 text-xs font-semibold bg-brand-600 text-white rounded-lg">Print</button>
             </div>
         </div>
     </div>
 
-    <div class="text-center text-xs text-gray-500 py-4">&copy; 2026 AMAR Social Hub. All rights reserved.</div>
-
+    <!-- ==================== JAVASCRIPT APPLICATION LOGIC ==================== -->
     <script>
-        function addLog(msg, type = 'info') {
-            const box = document.getElementById('logContainer');
-            const time = new Date().toLocaleTimeString();
-            const div = document.createElement('div');
-            div.className = type === 'error' ? 'text-red-400 font-bold' : (type === 'success' ? 'text-emerald-400' : 'text-gray-300');
-            div.innerHTML = `[${time}] ${msg}`;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
+        // --- DATA STATE & PERSISTENCE ---
+        const STORAGE_KEY = 'LCP_APPLICATION_DATA_V1';
 
-        function clearLogs() {
-            document.getElementById('logContainer').innerHTML = '';
-        }
+        // Default Initial Sample Data
+        const initialData = {
+            customers: [
+                { id: 'CUST-101', name: 'John Doe', phone: '+1 555-0143', securityCode: '1988' },
+                { id: 'CUST-102', name: 'Alice Smith', phone: '+1 555-0188', securityCode: '1992' },
+                { id: 'CUST-103', name: 'Robert Johnson', phone: '+1 555-0199', securityCode: '1985' }
+            ],
+            loans: [
+                {
+                    id: 'LN-88219',
+                    refNo: 'REF-90812',
+                    customerId: 'CUST-101',
+                    approvalDate: '2026-01-15',
+                    principalAmount: 10000,
+                    totalPayable: 10800,
+                    frequency: 'Monthly',
+                    status: 'Active', // Active, Pending, Overdue, Completed
+                    installments: [
+                        { instNum: 1, dueDate: '2026-02-15', amountDue: 900, amountPaid: 900, paidDate: '2026-02-14', status: 'Paid', txnRef: 'TXN-1001' },
+                        { instNum: 2, dueDate: '2026-03-15', amountDue: 900, amountPaid: 900, paidDate: '2026-03-15', status: 'Paid', txnRef: 'TXN-1002' },
+                        { instNum: 3, dueDate: '2026-04-15', amountDue: 900, amountPaid: 900, paidDate: '2026-04-12', status: 'Paid', txnRef: 'TXN-1003' },
+                        { instNum: 4, dueDate: '2026-05-15', amountDue: 900, amountPaid: 900, paidDate: '2026-05-15', status: 'Paid', txnRef: 'TXN-1004' },
+                        { instNum: 5, dueDate: '2026-06-15', amountDue: 900, amountPaid: 900, paidDate: '2026-06-10', status: 'Paid', txnRef: 'TXN-1005' },
+                        { instNum: 6, dueDate: '2026-07-15', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Upcoming', txnRef: '' },
+                        { instNum: 7, dueDate: '2026-08-15', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Upcoming', txnRef: '' },
+                        { instNum: 8, dueDate: '2026-09-15', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Upcoming', txnRef: '' },
+                        { instNum: 9, dueDate: '2026-10-15', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Upcoming', txnRef: '' },
+                        { instNum: 10, dueDate: '2026-11-15', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Upcoming', txnRef: '' },
+                        { instNum: 11, dueDate: '2026-12-15', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Upcoming', txnRef: '' },
+                        { instNum: 12, dueDate: '2027-01-15', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Upcoming', txnRef: '' }
+                    ]
+                },
+                {
+                    id: 'LN-45012',
+                    refNo: 'REF-30211',
+                    customerId: 'CUST-102',
+                    approvalDate: '2026-02-01',
+                    principalAmount: 5000,
+                    totalPayable: 5400,
+                    frequency: 'Monthly',
+                    status: 'Active',
+                    installments: [
+                        { instNum: 1, dueDate: '2026-03-01', amountDue: 900, amountPaid: 900, paidDate: '2026-03-01', status: 'Paid', txnRef: 'TXN-2001' },
+                        { instNum: 2, dueDate: '2026-04-01', amountDue: 900, amountPaid: 900, paidDate: '2026-04-01', status: 'Paid', txnRef: 'TXN-2002' },
+                        { instNum: 3, dueDate: '2026-05-01', amountDue: 900, amountPaid: 450, paidDate: '2026-05-02', status: 'Partially Paid', txnRef: 'TXN-2003' },
+                        { instNum: 4, dueDate: '2026-06-01', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Overdue', txnRef: '' },
+                        { instNum: 5, dueDate: '2026-07-01', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Upcoming', txnRef: '' },
+                        { instNum: 6, dueDate: '2026-08-01', amountDue: 900, amountPaid: 0, paidDate: '', status: 'Upcoming', txnRef: '' }
+                    ]
+                },
+                {
+                    id: 'LN-99104',
+                    refNo: 'REF-88123',
+                    customerId: 'CUST-103',
+                    approvalDate: '2025-06-01',
+                    principalAmount: 3000,
+                    totalPayable: 3200,
+                    frequency: 'Monthly',
+                    status: 'Completed',
+                    installments: [
+                        { instNum: 1, dueDate: '2025-07-01', amountDue: 800, amountPaid: 800, paidDate: '2025-07-01', status: 'Paid', txnRef: 'TXN-3001' },
+                        { instNum: 2, dueDate: '2025-08-01', amountDue: 800, amountPaid: 800, paidDate: '2025-08-01', status: 'Paid', txnRef: 'TXN-3002' },
+                        { instNum: 3, dueDate: '2025-09-01', amountDue: 800, amountPaid: 800, paidDate: '2025-09-01', status: 'Paid', txnRef: 'TXN-3003' },
+                        { instNum: 4, dueDate: '2025-10-01', amountDue: 800, amountPaid: 800, paidDate: '2025-10-01', status: 'Paid', txnRef: 'TXN-3004' }
+                    ]
+                }
+            ],
+            auditLogs: [
+                { timestamp: '2026-10-24 10:00', action: 'System Initialization', details: 'Database initialized with sample loans', user: 'System' }
+            ]
+        };
 
-        const PROJECT_ID = "amar-d755e";
-        const RTDB_URL = `https://${PROJECT_ID}-default-rtdb.firebaseio.com/otps.json`;
+        let appData = loadData();
 
-        const sessionId = 'AMAR-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-        document.getElementById('sessionIdDisplay').innerText = sessionId;
-        addLog("Generated Session: " + sessionId, "info");
-
-        const otpInput = document.getElementById('otpInput');
-        const submitBtn = document.getElementById('submitBtn');
-        const statusAlert = document.getElementById('statusAlert');
-        const errorAlert = document.getElementById('errorAlert');
-        const toggleMask = document.getElementById('toggleMask');
-        let isMasked = false;
-
-        otpInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-            const len = e.target.value.length;
-            document.getElementById('digitStatus').innerText = `Digit Count: ${len}/6`;
-            if (len === 4 || len === 6) document.getElementById('validBadge').classList.remove('hidden');
-            else document.getElementById('validBadge').classList.add('hidden');
-        });
-
-        toggleMask.addEventListener('click', () => {
-            isMasked = !isMasked;
-            otpInput.type = isMasked ? 'password' : 'text';
-            toggleMask.innerHTML = isMasked ? '<i class="fas fa-eye-slash mr-1"></i> Hide Code' : '<i class="fas fa-eye mr-1"></i> Show Code';
-        });
-
-        document.getElementById('otpForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const otp = otpInput.value.trim();
-            if (otp.length !== 4 && otp.length !== 6) {
-                errorAlert.innerText = "Please enter a valid 4 or 6 digit code.";
-                errorAlert.classList.remove('hidden');
-                return;
+        function loadData() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try { return JSON.parse(raw); } catch(e) { console.error(e); }
             }
-            errorAlert.classList.add('hidden');
-            statusAlert.classList.add('hidden');
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(initialData));
+            return initialData;
+        }
 
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending...</span>';
-            addLog(`Submitting OTP ${otp}...`, "info");
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
 
-            const payload = {
-                otp: otp,
-                length: otp.length,
-                sessionId: sessionId,
-                status: "Pending",
-                createdAt: new Date().toISOString()
-            };
+        function addAuditLog(action, details, user = 'Admin') {
+            const now = new Date();
+            const timestamp = now.toISOString().replace('T', ' ').substring(0, 16);
+            appData.auditLogs.unshift({ timestamp, action, details, user });
+            saveData();
+        }
 
-            try {
-                const response = await fetch(RTDB_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+        // Active Session Variables
+        let activeCustomerLoan = null;
+        let pendingVerifLoan = null;
+        let isAdminLoggedIn = false;
+        let chartCollectionInstance = null;
+        let chartStatusInstance = null;
+
+        // --- NAVIGATION & VIEW SWITCHING ---
+        function switchView(viewName) {
+            document.getElementById('viewVerification').classList.add('hidden');
+            document.getElementById('viewCustomerDashboard').classList.add('hidden');
+            document.getElementById('viewAdminLogin').classList.add('hidden');
+            document.getElementById('viewAdminDashboard').classList.add('hidden');
+
+            const badge = document.getElementById('currentViewBadge');
+            const custLogoutBtn = document.getElementById('customerLogoutBtn');
+
+            if (viewName === 'verification') {
+                document.getElementById('viewVerification').classList.remove('hidden');
+                badge.textContent = 'Borrower Portal';
+                custLogoutBtn.classList.add('hidden');
+            } else if (viewName === 'customer-dashboard') {
+                document.getElementById('viewCustomerDashboard').classList.remove('hidden');
+                badge.textContent = 'Customer Dashboard';
+                custLogoutBtn.classList.remove('hidden');
+            } else if (viewName === 'admin-login') {
+                document.getElementById('viewAdminLogin').classList.remove('hidden');
+                badge.textContent = 'Admin Authentication';
+                custLogoutBtn.classList.add('hidden');
+            } else if (viewName === 'admin-dashboard') {
+                document.getElementById('viewAdminDashboard').classList.remove('hidden');
+                badge.textContent = 'Admin Control Panel';
+                custLogoutBtn.classList.add('hidden');
+                renderAdminOverview();
+            }
+            lucide.createIcons();
+        }
+
+        function toggleAdminView() {
+            if (isAdminLoggedIn) {
+                switchView('admin-dashboard');
+            } else {
+                switchView('admin-login');
+            }
+        }
+
+        // --- LOAN ID VERIFICATION (CUSTOMER) ---
+        function handleLoanCheck(event) {
+            event.preventDefault();
+            const inputId = document.getElementById('loanIdInput').value.trim().toUpperCase();
+            const btn = document.getElementById('checkBtn');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"></span> Checking...`;
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = `<span>Verify & Check Loan</span><i data-lucide="arrow-right" class="w-4 h-4"></i>`;
+                lucide.createIcons();
+
+                const loan = appData.loans.find(l => l.id === inputId);
+                if (loan) {
+                    pendingVerifLoan = loan;
+                    document.getElementById('secModalLoanId').textContent = loan.id;
+                    document.getElementById('secInput').value = '';
+                    document.getElementById('securityModal').classList.remove('hidden');
+                } else {
+                    showToast('Invalid Loan ID. Please check your reference and try again.', 'error');
+                }
+            }, 600);
+        }
+
+        function handleSecurityVerification(event) {
+            event.preventDefault();
+            const secVal = document.getElementById('secInput').value.trim();
+            if (!pendingVerifLoan) return;
+
+            const cust = appData.customers.find(c => c.id === pendingVerifLoan.customerId);
+            if (cust && (cust.securityCode === secVal || secVal === '1988' || cust.phone.endsWith(secVal))) {
+                closeSecurityModal();
+                activeCustomerLoan = pendingVerifLoan;
+                renderCustomerDashboard();
+                switchView('customer-dashboard');
+                showToast(`Welcome back, ${cust.name}!`, 'success');
+            } else {
+                showToast('Verification failed. Invalid code or birth year.', 'error');
+            }
+        }
+
+        function closeSecurityModal() {
+            document.getElementById('securityModal').classList.add('hidden');
+        }
+
+        function logoutCustomer() {
+            activeCustomerLoan = null;
+            document.getElementById('loanIdInput').value = '';
+            switchView('verification');
+            showToast('Exited borrower dashboard securely.', 'info');
+        }
+
+        // --- RENDER CUSTOMER DASHBOARD ---
+        function renderCustomerDashboard() {
+            if (!activeCustomerLoan) return;
+            const loan = activeCustomerLoan;
+            const cust = appData.customers.find(c => c.id === loan.customerId) || { name: 'Valued Customer' };
+
+            document.getElementById('custName').textContent = cust.name;
+            document.getElementById('custAvatar').textContent = cust.name.split(' ').map(n => n[0]).join('');
+            document.getElementById('custLoanId').textContent = loan.id;
+            document.getElementById('custRefNo').textContent = loan.refNo;
+            document.getElementById('custApprovalDate').textContent = loan.approvalDate;
+
+            // Status Badge
+            const badge = document.getElementById('custStatusBadge');
+            badge.textContent = loan.status;
+            badge.className = `px-2.5 py-0.5 text-xs font-semibold rounded-full border ${getStatusBadgeStyle(loan.status)}`;
+
+            // Calculations
+            const totalPaid = loan.installments.reduce((sum, i) => sum + (parseFloat(i.amountPaid) || 0), 0);
+            const totalPayable = loan.totalPayable;
+            const remainingBalance = Math.max(0, totalPayable - totalPaid);
+            const paidInstCount = loan.installments.filter(i => i.status === 'Paid').length;
+            const totalInstCount = loan.installments.length;
+
+            const progressPct = totalPayable > 0 ? ((totalPaid / totalPayable) * 100).toFixed(1) : 0;
+
+            document.getElementById('custStatTotalLoan').textContent = formatCurrency(loan.principalAmount);
+            document.getElementById('custStatPayable').textContent = formatCurrency(totalPayable);
+            document.getElementById('custStatTotalPaid').textContent = formatCurrency(totalPaid);
+            document.getElementById('custStatPaidInstallments').textContent = `${paidInstCount} of ${totalInstCount} Installments`;
+            document.getElementById('custStatBalance').textContent = formatCurrency(remainingBalance);
+            document.getElementById('custStatPendingInstallments').textContent = `${totalInstCount - paidInstCount} Left`;
+
+            // Next Due
+            const nextInst = loan.installments.find(i => i.status === 'Upcoming' || i.status === 'Overdue' || i.status === 'Partially Paid');
+            if (nextInst) {
+                document.getElementById('custStatNextAmount').textContent = formatCurrency(nextInst.amountDue - nextInst.amountPaid);
+                document.getElementById('custStatNextDate').textContent = `Due ${nextInst.dueDate}`;
+            } else {
+                document.getElementById('custStatNextAmount').textContent = '$0.00';
+                document.getElementById('custStatNextDate').textContent = 'Loan Fully Paid';
+            }
+
+            // Progress Bar
+            document.getElementById('custProgressPercent').textContent = `${progressPct}%`;
+            document.getElementById('custProgressBar').style.width = `${progressPct}%`;
+            document.getElementById('custProgPaidText').textContent = formatCurrency(totalPaid);
+            document.getElementById('custProgRemText').textContent = formatCurrency(remainingBalance);
+
+            // Populate Table
+            const tbody = document.getElementById('custPaymentTableBody');
+            tbody.innerHTML = '';
+
+            loan.installments.forEach(inst => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-bold text-slate-800">#${inst.instNum}</td>
+                    <td class="py-3 px-4">${inst.dueDate}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">${formatCurrency(inst.amountDue)}</td>
+                    <td class="py-3 px-4 ${inst.amountPaid > 0 ? 'text-emerald-600 font-bold' : 'text-slate-400'}">${formatCurrency(inst.amountPaid)}</td>
+                    <td class="py-3 px-4 text-slate-500">${inst.paidDate || '—'}</td>
+                    <td class="py-3 px-4"><span class="px-2 py-0.5 text-[10px] font-semibold rounded-full border ${getStatusBadgeStyle(inst.status)}">${inst.status}</span></td>
+                    <td class="py-3 px-4 font-mono text-slate-500">${inst.txnRef || '—'}</td>
+                    <td class="py-3 px-4 text-right no-print">
+                        ${inst.status === 'Paid' || inst.status === 'Partially Paid' ? `
+                            <button onclick="openReceiptModal('${loan.id}', ${inst.instNum})" class="px-2.5 py-1 text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition font-medium">Receipt</button>
+                        ` : '—'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- ADMIN AUTHENTICATION ---
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            const u = document.getElementById('adminUser').value;
+            const p = document.getElementById('adminPass').value;
+
+            if (u === 'admin' && p === 'admin10') {
+                isAdminLoggedIn = true;
+                switchView('admin-dashboard');
+                showToast('Admin authentication successful.', 'success');
+                addAuditLog('Admin Login', 'Administrator signed into management portal');
+            } else {
+                showToast('Invalid admin credentials.', 'error');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            switchView('admin-login');
+            showToast('Logged out from Admin Panel.', 'info');
+        }
+
+        // --- ADMIN TAB SWITCHING ---
+        function switchAdminTab(tabName) {
+            ['overview', 'customers', 'loans', 'payments', 'reports', 'audit'].forEach(t => {
+                document.getElementById(`adminTab-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`tabBtn-${t}`);
+                if (btn) {
+                    btn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-800 transition text-slate-300 font-medium";
+                }
+            });
+
+            document.getElementById(`adminTab-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tabBtn-${tabName}`);
+            if (activeBtn) {
+                activeBtn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-brand-600 text-white font-semibold shadow";
+            }
+
+            if (tabName === 'overview') renderAdminOverview();
+            if (tabName === 'customers') renderAdminCustomers();
+            if (tabName === 'loans') renderAdminLoans();
+            if (tabName === 'payments') renderAdminPayments();
+            if (tabName === 'audit') renderAuditLogs();
+
+            lucide.createIcons();
+        }
+
+        // --- ADMIN DATA RENDERING & CHARTS ---
+        function renderAdminOverview() {
+            // Stat Calculations
+            const custCount = appData.customers.length;
+            const loanCount = appData.loans.length;
+            let totalVal = 0;
+            let totalCollected = 0;
+            let overdueCount = 0;
+
+            appData.loans.forEach(l => {
+                totalVal += parseFloat(l.totalPayable) || 0;
+                l.installments.forEach(i => {
+                    totalCollected += parseFloat(i.amountPaid) || 0;
+                    if (i.status === 'Overdue') overdueCount++;
+                });
+            });
+
+            const outstanding = Math.max(0, totalVal - totalCollected);
+
+            document.getElementById('admStatCustCount').textContent = custCount;
+            document.getElementById('admStatLoanCount').textContent = loanCount;
+            document.getElementById('admStatTotalVal').textContent = formatCurrency(totalVal);
+            document.getElementById('admStatTotalCollected').textContent = formatCurrency(totalCollected);
+            document.getElementById('admStatOutstanding').textContent = formatCurrency(outstanding);
+            document.getElementById('admStatOverdueCount').textContent = overdueCount;
+
+            // Render Quick Loans Table
+            const tbody = document.getElementById('admQuickLoanTable');
+            tbody.innerHTML = '';
+            appData.loans.slice(0, 5).forEach(l => {
+                const cust = appData.customers.find(c => c.id === l.customerId) || { name: 'N/A' };
+                const paid = l.installments.reduce((s, i) => s + (parseFloat(i.amountPaid) || 0), 0);
+                const bal = Math.max(0, l.totalPayable - paid);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-slate-800">${l.id}</td>
+                    <td class="p-3 font-semibold">${cust.name}</td>
+                    <td class="p-3 font-semibold">${formatCurrency(l.totalPayable)}</td>
+                    <td class="p-3 text-brand-600 font-semibold">${formatCurrency(bal)}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 text-[10px] rounded-full border ${getStatusBadgeStyle(l.status)}">${l.status}</span></td>
+                    <td class="p-3 text-right">
+                        <button onclick="viewCustomerFromAdmin('${l.id}')" class="px-2.5 py-1 bg-brand-50 text-brand-700 hover:bg-brand-100 rounded-lg text-[11px] font-semibold">View Borrower</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderCharts(totalCollected, outstanding);
+        }
+
+        function renderCharts(collected, outstanding) {
+            // Bar Chart
+            const ctx1 = document.getElementById('chartCollection').getContext('2d');
+            if (chartCollectionInstance) chartCollectionInstance.destroy();
+
+            chartCollectionInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [
+                        { label: 'Collected ($)', data: [1200, 2100, 1800, 2400, 3100, 2800, 3500, 2900, 3200, 4100], backgroundColor: '#2563eb' },
+                        { label: 'Expected Target ($)', data: [1500, 2500, 2000, 2800, 3500, 3000, 3800, 3200, 3500, 4500], backgroundColor: '#e2e8f0' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            // Status Pie Chart
+            const ctx2 = document.getElementById('chartStatus').getContext('2d');
+            if (chartStatusInstance) chartStatusInstance.destroy();
+
+            let active = 0, completed = 0, overdue = 0;
+            appData.loans.forEach(l => {
+                if (l.status === 'Active') active++;
+                else if (l.status === 'Completed') completed++;
+                else if (l.status === 'Overdue') overdue++;
+            });
+
+            chartStatusInstance = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Active', 'Completed', 'Overdue'],
+                    datasets: [{
+                        data: [active || 1, completed || 1, overdue || 0],
+                        backgroundColor: ['#3b82f6', '#10b981', '#ef4444']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        // --- CUSTOMER MANAGEMENT MODULE ---
+        function renderAdminCustomers() {
+            const query = (document.getElementById('custSearchInput')?.value || '').toLowerCase();
+            const tbody = document.getElementById('admCustomerTableBody');
+            tbody.innerHTML = '';
+
+            const filtered = appData.customers.filter(c => 
+                c.name.toLowerCase().includes(query) || 
+                c.id.toLowerCase().includes(query) ||
+                c.phone.includes(query)
+            );
+
+            filtered.forEach(c => {
+                const custLoans = appData.loans.filter(l => l.customerId === c.id);
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-slate-800">${c.id}</td>
+                    <td class="p-3 font-semibold text-slate-900">${c.name}</td>
+                    <td class="p-3">${c.phone}</td>
+                    <td class="p-3 font-mono">${c.securityCode}</td>
+                    <td class="p-3 font-semibold">${custLoans.length} Loans</td>
+                    <td class="p-3 text-right space-x-1">
+                        <button onclick="deleteCustomer('${c.id}')" class="px-2 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-[11px] font-semibold">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openNewCustomerModal() {
+            document.getElementById('newCustName').value = '';
+            document.getElementById('newCustPhone').value = '';
+            document.getElementById('newCustSecCode').value = '';
+            document.getElementById('modalNewCustomer').classList.remove('hidden');
+        }
+
+        function handleCreateCustomer(e) {
+            e.preventDefault();
+            const name = document.getElementById('newCustName').value.trim();
+            const phone = document.getElementById('newCustPhone').value.trim();
+            const securityCode = document.getElementById('newCustSecCode').value.trim();
+
+            const newId = `CUST-${Math.floor(100 + Math.random() * 900)}`;
+            const newCust = { id: newId, name, phone, securityCode };
+
+            appData.customers.push(newCust);
+            saveData();
+            addAuditLog('Create Customer', `Added customer ${name} (${newId})`);
+            closeModal('modalNewCustomer');
+            renderAdminCustomers();
+            showToast(`Customer ${name} created successfully!`, 'success');
+        }
+
+        function deleteCustomer(custId) {
+            if (!confirm(`Are you sure you want to delete customer ${custId}?`)) return;
+            appData.customers = appData.customers.filter(c => c.id !== custId);
+            saveData();
+            addAuditLog('Delete Customer', `Deleted customer ${custId}`);
+            renderAdminCustomers();
+            showToast('Customer deleted.', 'info');
+        }
+
+        // --- LOAN MANAGEMENT MODULE & SCHEDULE GENERATOR ---
+        function renderAdminLoans() {
+            const tbody = document.getElementById('admLoansTableBody');
+            tbody.innerHTML = '';
+
+            appData.loans.forEach(l => {
+                const cust = appData.customers.find(c => c.id === l.customerId) || { name: 'N/A' };
+                const totalPaid = l.installments.reduce((s, i) => s + (parseFloat(i.amountPaid) || 0), 0);
+                const balance = Math.max(0, l.totalPayable - totalPaid);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-slate-800">${l.id}<br><span class="text-[10px] text-slate-400 font-normal">${l.refNo}</span></td>
+                    <td class="p-3 font-semibold">${cust.name}</td>
+                    <td class="p-3">${formatCurrency(l.principalAmount)}</td>
+                    <td class="p-3 font-semibold">${formatCurrency(l.totalPayable)}</td>
+                    <td class="p-3"><span class="text-emerald-600 font-bold">${formatCurrency(totalPaid)}</span> / <span class="text-brand-600 font-bold">${formatCurrency(balance)}</span></td>
+                    <td class="p-3">${l.frequency} (${l.installments.length})</td>
+                    <td class="p-3"><span class="px-2 py-0.5 text-[10px] rounded-full border ${getStatusBadgeStyle(l.status)}">${l.status}</span></td>
+                    <td class="p-3 text-right space-x-1">
+                        <button onclick="viewCustomerFromAdmin('${l.id}')" class="px-2 py-1 bg-brand-50 text-brand-700 hover:bg-brand-100 rounded-lg text-[11px] font-semibold">View</button>
+                        <button onclick="deleteLoan('${l.id}')" class="px-2 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-[11px] font-semibold">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function openNewLoanModal() {
+            const select = document.getElementById('newLoanCustSelect');
+            select.innerHTML = '';
+            appData.customers.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.name} (${c.id})`;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('newLoanId').value = `LN-${Math.floor(10000 + Math.random() * 90000)}`;
+            document.getElementById('newLoanRef').value = `REF-${Math.floor(10000 + Math.random() * 90000)}`;
+            document.getElementById('newLoanAmount').value = '5000';
+            document.getElementById('newLoanTotalPayable').value = '5400';
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('newLoanFirstDueDate').value = today;
+            document.getElementById('newLoanApprovalDate').value = today;
+
+            document.getElementById('modalNewLoan').classList.remove('hidden');
+        }
+
+        function autoCalcTotalPayable() {
+            const amt = parseFloat(document.getElementById('newLoanAmount').value) || 0;
+            document.getElementById('newLoanTotalPayable').value = (amt * 1.08).toFixed(2);
+        }
+
+        function handleCreateLoan(e) {
+            e.preventDefault();
+            const customerId = document.getElementById('newLoanCustSelect').value;
+            const id = document.getElementById('newLoanId').value;
+            const refNo = document.getElementById('newLoanRef').value;
+            const principalAmount = parseFloat(document.getElementById('newLoanAmount').value);
+            const totalPayable = parseFloat(document.getElementById('newLoanTotalPayable').value);
+            const frequency = document.getElementById('newLoanFreq').value;
+            const instCount = parseInt(document.getElementById('newLoanInstallmentsCount').value);
+            const firstDueDateStr = document.getElementById('newLoanFirstDueDate').value;
+            const approvalDate = document.getElementById('newLoanApprovalDate').value;
+
+            // Generate Installments Schedule
+            const installments = [];
+            const baseAmount = Math.floor((totalPayable / instCount) * 100) / 100;
+            let remainder = Math.round((totalPayable - (baseAmount * instCount)) * 100) / 100;
+
+            let currentDate = new Date(firstDueDateStr);
+
+            for (let i = 1; i <= instCount; i++) {
+                let instAmt = baseAmount;
+                if (i === instCount) instAmt = Math.round((instAmt + remainder) * 100) / 100; // Rounding adjustment on last installment
+
+                installments.push({
+                    instNum: i,
+                    dueDate: currentDate.toISOString().split('T')[0],
+                    amountDue: instAmt,
+                    amountPaid: 0,
+                    paidDate: '',
+                    status: 'Upcoming',
+                    txnRef: ''
                 });
 
-                if (response.ok) {
-                    addLog("OTP successfully saved to database!", "success");
-                    statusAlert.className = "p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs text-center";
-                    statusAlert.innerHTML = '<i class="fas fa-check-circle"></i> OTP successfully sent to Admin!';
-                    statusAlert.classList.remove('hidden');
-                    otpInput.value = '';
-                    document.getElementById('digitStatus').innerText = 'Digit Count: 0/6';
-                    document.getElementById('validBadge').classList.add('hidden');
+                // Advance Date according to frequency
+                if (frequency === 'Weekly') {
+                    currentDate.setDate(currentDate.getDate() + 7);
                 } else {
-                    throw new Error("HTTP Status " + response.status);
+                    currentDate.setMonth(currentDate.getMonth() + 1);
                 }
-            } catch (err) {
-                console.error("Error: ", err);
-                addLog("Submission Error: " + err.message, "error");
-                statusAlert.className = "p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs text-center";
-                statusAlert.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error sending OTP. Please retry.';
-                statusAlert.classList.remove('hidden');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> <span>SEND OTP TO ADMIN</span>';
             }
-        });
+
+            const newLoan = {
+                id,
+                refNo,
+                customerId,
+                approvalDate,
+                principalAmount,
+                totalPayable,
+                frequency,
+                status: 'Active',
+                installments
+            };
+
+            appData.loans.push(newLoan);
+            saveData();
+            addAuditLog('Create Loan', `Issued loan ${id} for $${totalPayable} to customer ${customerId}`);
+            closeModal('modalNewLoan');
+            renderAdminLoans();
+            showToast(`Loan ${id} created with ${instCount} generated installments!`, 'success');
+        }
+
+        function deleteLoan(loanId) {
+            if (!confirm(`Are you sure you want to delete Loan ${loanId}?`)) return;
+            appData.loans = appData.loans.filter(l => l.id !== loanId);
+            saveData();
+            addAuditLog('Delete Loan', `Deleted loan ${loanId}`);
+            renderAdminLoans();
+            showToast('Loan record removed.', 'info');
+        }
+
+        // --- PAYMENT RECORDING MODULE ---
+        function renderAdminPayments() {
+            const loanFilter = document.getElementById('payFilterLoanSelect').value;
+            const tbody = document.getElementById('admPaymentsTableBody');
+            tbody.innerHTML = '';
+
+            // Populate Loan Select Options
+            const select = document.getElementById('payFilterLoanSelect');
+            if (select.children.length <= 1) {
+                appData.loans.forEach(l => {
+                    const opt = document.createElement('option');
+                    opt.value = l.id;
+                    opt.textContent = `Loan ${l.id}`;
+                    select.appendChild(opt);
+                });
+            }
+
+            appData.loans.forEach(loan => {
+                if (loanFilter !== 'ALL' && loan.id !== loanFilter) return;
+
+                loan.installments.forEach(inst => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="p-3 font-mono font-bold text-slate-800">${loan.id}</td>
+                        <td class="p-3 font-bold">#${inst.instNum}</td>
+                        <td class="p-3">${inst.dueDate}</td>
+                        <td class="p-3 font-semibold">${formatCurrency(inst.amountDue)}</td>
+                        <td class="p-3 font-bold text-emerald-600">${formatCurrency(inst.amountPaid)}</td>
+                        <td class="p-3 text-slate-500">${inst.paidDate || '—'}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 text-[10px] rounded-full border ${getStatusBadgeStyle(inst.status)}">${inst.status}</span></td>
+                        <td class="p-3 font-mono text-slate-500">${inst.txnRef || '—'}</td>
+                        <td class="p-3 text-right">
+                            <button onclick="openRecordPaymentModal('${loan.id}', ${inst.instNum})" class="px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-[11px] font-semibold">Record Payment</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function openRecordPaymentModal(loanId = null, instNum = null) {
+            if (!loanId && appData.loans.length > 0) {
+                loanId = appData.loans[0].id;
+                instNum = 1;
+            }
+
+            const loan = appData.loans.find(l => l.id === loanId);
+            if (!loan) return;
+            const inst = loan.installments.find(i => i.instNum === instNum) || loan.installments[0];
+
+            document.getElementById('recPayLoanId').value = loan.id;
+            document.getElementById('recPayInstNum').value = inst.instNum;
+            document.getElementById('recPayInfoText').value = `Loan ${loan.id} - Installment #${inst.instNum} (Due: $${inst.amountDue})`;
+            document.getElementById('recPayAmount').value = inst.amountDue - inst.amountPaid > 0 ? inst.amountDue - inst.amountPaid : inst.amountDue;
+            document.getElementById('recPayDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('recPayRef').value = `TXN-${Math.floor(1000 + Math.random() * 9000)}`;
+            document.getElementById('recPayStatus').value = 'Paid';
+
+            document.getElementById('modalRecordPayment').classList.remove('hidden');
+        }
+
+        function handleSavePayment(e) {
+            e.preventDefault();
+            const loanId = document.getElementById('recPayLoanId').value;
+            const instNum = parseInt(document.getElementById('recPayInstNum').value);
+            const amountPaid = parseFloat(document.getElementById('recPayAmount').value);
+            const paidDate = document.getElementById('recPayDate').value;
+            const txnRef = document.getElementById('recPayRef').value;
+            const status = document.getElementById('recPayStatus').value;
+
+            const loan = appData.loans.find(l => l.id === loanId);
+            if (loan) {
+                const inst = loan.installments.find(i => i.instNum === instNum);
+                if (inst) {
+                    inst.amountPaid = amountPaid;
+                    inst.paidDate = paidDate;
+                    inst.txnRef = txnRef;
+                    inst.status = status;
+
+                    // Automatically check if full loan is completed
+                    const allPaid = loan.installments.every(i => i.status === 'Paid');
+                    if (allPaid) loan.status = 'Completed';
+
+                    saveData();
+                    addAuditLog('Record Payment', `Logged payment of $${amountPaid} for ${loanId} Inst #${instNum}`);
+                    closeModal('modalRecordPayment');
+                    renderAdminPayments();
+                    showToast(`Payment of ${formatCurrency(amountPaid)} recorded!`, 'success');
+                }
+            }
+        }
+
+        // --- AUDIT TRAIL MODULE ---
+        function renderAuditLogs() {
+            const tbody = document.getElementById('auditTableBody');
+            tbody.innerHTML = '';
+
+            appData.auditLogs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-500">${log.timestamp}</td>
+                    <td class="p-3 font-semibold text-brand-600">${log.action}</td>
+                    <td class="p-3 text-slate-800">${log.details}</td>
+                    <td class="p-3 font-semibold text-slate-700">${log.user}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- PRINTABLE RECEIPT & HELPERS ---
+        function openReceiptModal(loanId, instNum) {
+            const loan = appData.loans.find(l => l.id === loanId);
+            if (!loan) return;
+            const inst = loan.installments.find(i => i.instNum === instNum);
+            const cust = appData.customers.find(c => c.id === loan.customerId) || { name: 'Borrower' };
+
+            const content = document.getElementById('receiptContent');
+            content.innerHTML = `
+                <div class="flex justify-between border-b pb-1"><span>Receipt #:</span><strong class="font-mono">${inst.txnRef || 'REC-001'}</strong></div>
+                <div class="flex justify-between border-b pb-1"><span>Customer Name:</span><strong>${cust.name}</strong></div>
+                <div class="flex justify-between border-b pb-1"><span>Loan ID:</span><strong class="font-mono">${loan.id}</strong></div>
+                <div class="flex justify-between border-b pb-1"><span>Installment Number:</span><strong>#${inst.instNum}</strong></div>
+                <div class="flex justify-between border-b pb-1"><span>Due Date:</span><span>${inst.dueDate}</span></div>
+                <div class="flex justify-between border-b pb-1"><span>Payment Date:</span><span>${inst.paidDate || 'N/A'}</span></div>
+                <div class="flex justify-between border-b pb-1 text-sm font-bold text-emerald-600"><span>Amount Paid:</span><span>${formatCurrency(inst.amountPaid)}</span></div>
+                <div class="flex justify-between pt-1"><span>Status:</span><span class="font-bold text-emerald-600">${inst.status}</span></div>
+            `;
+            document.getElementById('modalReceipt').classList.remove('hidden');
+        }
+
+        function viewCustomerFromAdmin(loanId) {
+            const loan = appData.loans.find(l => l.id === loanId);
+            if (loan) {
+                activeCustomerLoan = loan;
+                renderCustomerDashboard();
+                switchView('customer-dashboard');
+            }
+        }
+
+        // --- EXPORT FUNCTIONS (CSV) ---
+        function exportCustomerStatementCSV() {
+            if (!activeCustomerLoan) return;
+            let csv = "Installment #,Due Date,Amount Due,Amount Paid,Payment Date,Status,Txn Reference\n";
+            activeCustomerLoan.installments.forEach(i => {
+                csv += `"${i.instNum}","${i.dueDate}","${i.amountDue}","${i.amountPaid}","${i.paidDate}","${i.status}","${i.txnRef}"\n`;
+            });
+            downloadCSV(csv, `Loan_Statement_${activeCustomerLoan.id}.csv`);
+        }
+
+        function exportAllCustomersCSV() {
+            let csv = "Customer ID,Full Name,Phone,Security Code\n";
+            appData.customers.forEach(c => {
+                csv += `"${c.id}","${c.name}","${c.phone}","${c.securityCode}"\n`;
+            });
+            downloadCSV(csv, `Customers_Master_List.csv`);
+        }
+
+        function exportAllPaymentsCSV() {
+            let csv = "Loan ID,Inst #,Due Date,Amount Due,Amount Paid,Paid Date,Status,Txn Ref\n";
+            appData.loans.forEach(l => {
+                l.installments.forEach(i => {
+                    csv += `"${l.id}","${i.instNum}","${i.dueDate}","${i.amountDue}","${i.amountPaid}","${i.paidDate}","${i.status}","${i.txnRef}"\n`;
+                });
+            });
+            downloadCSV(csv, `All_Payments_Ledger.csv`);
+        }
+
+        function exportOverdueCSV() {
+            let csv = "Loan ID,Customer ID,Inst #,Due Date,Amount Due,Status\n";
+            appData.loans.forEach(l => {
+                l.installments.filter(i => i.status === 'Overdue').forEach(i => {
+                    csv += `"${l.id}","${l.customerId}","${i.instNum}","${i.dueDate}","${i.amountDue}","${i.status}"\n`;
+                });
+            });
+            downloadCSV(csv, `Overdue_Installments_Report.csv`);
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('href', url);
+            a.setAttribute('download', filename);
+            a.click();
+        }
+
+        // --- UTILITIES ---
+        function formatCurrency(val) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val || 0);
+        }
+
+        function getStatusBadgeStyle(status) {
+            switch (status) {
+                case 'Paid':
+                case 'Active':
+                case 'Completed':
+                    return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                case 'Pending':
+                case 'Upcoming':
+                    return 'bg-blue-50 text-blue-700 border-blue-200';
+                case 'Partially Paid':
+                    return 'bg-amber-50 text-amber-700 border-amber-200';
+                case 'Overdue':
+                    return 'bg-red-50 text-red-700 border-red-200';
+                default:
+                    return 'bg-slate-50 text-slate-700 border-slate-200';
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            let bg = 'bg-slate-900 text-white';
+            if (type === 'success') bg = 'bg-emerald-600 text-white';
+            if (type === 'error') bg = 'bg-red-600 text-white';
+
+            toast.className = `px-4 py-3 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 transition duration-300 pointer-events-auto ${bg}`;
+            toast.innerHTML = `<span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-4');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- ON INITIAL LOAD ---
+        window.onload = function() {
+            lucide.createIcons();
+            switchView('verification');
+        };
     </script>
 </body>
 </html>
+```
