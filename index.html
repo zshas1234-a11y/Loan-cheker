@@ -1,179 +1,206 @@
-html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loan Check Portal & Management System</title>
+    <title>PakLoan Check Portal & Management System</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome CDN -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
+            body { background: #fff !important; color: #000 !important; }
         }
         .print-only { display: none; }
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Top Navigation Header -->
-    <header class="bg-emerald-800 text-white shadow-md no-print">
+    <!-- TOP NAVIGATION HEADER -->
+    <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-40 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo & Title -->
             <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('customer')">
-                <div class="bg-white text-emerald-800 p-2 rounded-lg font-bold text-xl">
+                <div class="bg-emerald-500 text-slate-950 p-2 rounded-xl font-black text-xl shadow-md shadow-emerald-500/20">
                     <i class="fa-solid fa-building-columns"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight">PakLoan Portal</h1>
-                    <p class="text-xs text-emerald-200">Customer Check & Management System</p>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight text-white">PakLoan <span class="text-emerald-400 font-normal">Portal</span></h1>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Verification & Management System</p>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-3">
-                <button id="nav-customer-btn" onclick="switchView('customer')" class="px-3 py-1.5 rounded-md text-sm font-medium bg-emerald-700 text-white hover:bg-emerald-600 transition">
-                    <i class="fa-solid fa-user-check mr-1.5"></i> Customer Portal
+            <!-- View Switcher Controls -->
+            <div class="flex items-center space-x-2">
+                <button id="nav-customer-btn" onclick="switchView('customer')" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-user-check text-sm"></i>
+                    <span>Customer Portal</span>
                 </button>
-                <button id="nav-admin-btn" onclick="switchView('admin')" class="px-3 py-1.5 rounded-md text-sm font-medium text-emerald-100 hover:bg-emerald-700 transition">
-                    <i class="fa-solid fa-lock mr-1.5"></i> Admin Login
+                <button id="nav-admin-btn" onclick="switchView('admin')" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-shield-halved text-sm"></i>
+                    <span>Admin Panel</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Container -->
+    <!-- MAIN APP CONTAINER -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- ================= CUSTOMER PORTAL ================= -->
+        <!-- ================================================================= -->
+        <!-- CUSTOMER VIEW SECTION                                             -->
+        <!-- ================================================================= -->
         <section id="customer-view" class="space-y-6">
             
-            <!-- Lookup Card -->
-            <div id="customer-login-card" class="max-w-lg mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-                <div class="bg-gradient-to-r from-emerald-700 to-teal-700 p-6 text-white text-center">
-                    <div class="inline-flex p-3 bg-white/10 rounded-full mb-3">
-                        <i class="fa-solid fa-magnifying-glass-dollar text-3xl"></i>
+            <!-- Customer Login / Verification Card -->
+            <div id="customer-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden mt-6 transition-all">
+                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 p-8 text-white text-center relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+                    <div class="inline-flex p-4 bg-emerald-500/20 text-emerald-400 rounded-2xl mb-4 border border-emerald-500/30">
+                        <i class="fa-solid fa-shield-cat text-3xl"></i>
                     </div>
-                    <h2 class="text-2xl font-bold">Check Loan Status</h2>
-                    <p class="text-emerald-100 text-sm mt-1">Enter your Loan ID and 4-Digit Security PIN</p>
+                    <h2 class="text-2xl font-extrabold tracking-tight">Check Loan Status</h2>
+                    <p class="text-slate-300 text-xs mt-1.5 max-w-xs mx-auto">Enter your Loan ID and 4-Digit PIN to access your real-time repayment schedule.</p>
                 </div>
 
-                <form id="customer-lookup-form" onsubmit="handleCustomerLookup(event)" class="p-6 space-y-4">
+                <form id="customer-lookup-form" onsubmit="handleCustomerLookup(event)" class="p-6 sm:p-8 space-y-5">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Loan Account ID</label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Loan Account ID</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                <i class="fa-solid fa-hashtag"></i>
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <i class="fa-solid fa-hashtag text-sm"></i>
                             </span>
-                            <input type="text" id="cust-loan-id" required placeholder="e.g. PKL-1001" 
-                                class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 uppercase">
+                            <input type="text" id="cust-loan-id" required placeholder="e.g. L-1001" 
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 font-mono font-bold uppercase transition">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">4-Digit Security PIN</label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">4-Digit Security PIN</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                <i class="fa-solid fa-key"></i>
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <i class="fa-solid fa-key text-sm"></i>
                             </span>
                             <input type="password" id="cust-pin" maxlength="4" pattern="\d{4}" required placeholder="••••" 
-                                class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 tracking-widest text-center text-lg">
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 font-mono tracking-[0.5em] text-center text-lg transition">
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">PIN was assigned to you by your loan officer.</p>
+                        <div class="flex justify-between items-center text-[11px] text-slate-400 mt-2">
+                            <span>PIN assigned by loan officer</span>
+                            <span class="text-emerald-600 font-medium">Demo: L-1001 / 1234</span>
+                        </div>
                     </div>
 
-                    <div id="cust-login-error" class="hidden p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm text-center"></div>
+                    <div id="cust-login-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-xs font-medium text-center"></div>
 
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2">
+                    <button type="submit" id="cust-submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 hover:shadow-xl transition flex items-center justify-center space-x-2">
                         <span>Access Loan Dashboard</span>
-                        <i class="fa-solid fa-arrow-right"></i>
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
                     </button>
                 </form>
             </div>
 
-            <!-- Customer Dashboard (Initially Hidden) -->
+            <!-- Customer Dashboard Screen (Initially Hidden) -->
             <div id="customer-dashboard" class="hidden space-y-6">
-                <!-- Top Summary Card -->
-                <div class="bg-white rounded-2xl shadow-md border border-slate-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <!-- Header / Identity Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <div class="flex items-center space-x-3">
-                            <h2 id="cust-dash-name" class="text-2xl font-bold text-slate-800">--</h2>
-                            <span id="cust-dash-badge" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800">Active</span>
+                            <h2 id="cust-dash-name" class="text-2xl font-extrabold text-slate-900">--</h2>
+                            <span id="cust-dash-badge" class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">Active</span>
                         </div>
-                        <p class="text-sm text-slate-500 mt-1">Loan ID: <span id="cust-dash-id" class="font-mono text-slate-700">--</span> | Phone: <span id="cust-dash-phone">--</span></p>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mt-1.5">
+                            <span>Loan Ref: <strong id="cust-dash-id" class="font-mono text-slate-800">--</strong></span>
+                            <span>•</span>
+                            <span>Phone: <strong id="cust-dash-phone" class="text-slate-800">--</strong></span>
+                            <span>•</span>
+                            <span>Approval Date: <strong id="cust-dash-approval" class="text-slate-800">--</strong></span>
+                        </div>
                     </div>
-                    <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
-                        <button onclick="printCustomerStatement()" class="no-print bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center space-x-2">
+                    <div class="flex items-center space-x-3 w-full md:w-auto justify-end no-print">
+                        <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2">
                             <i class="fa-solid fa-print"></i>
-                            <span>Print History</span>
+                            <span>Print Statement</span>
                         </button>
-                        <button onclick="logoutCustomer()" class="no-print bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center space-x-2">
+                        <button onclick="logoutCustomer()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2">
                             <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>Exit</span>
+                            <span>Exit Portal</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Financial Metrics Grid -->
+                <!-- Financial Summary Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Principal</div>
-                        <div id="cust-stat-principal" class="text-2xl font-bold text-slate-800 mt-1">Rs. 0</div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Original Principal</div>
+                        <div id="cust-stat-principal" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Payable</div>
-                        <div id="cust-stat-payable" class="text-2xl font-bold text-slate-800 mt-1">Rs. 0</div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Payable</div>
+                        <div id="cust-stat-payable" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <div class="text-xs font-medium font-emerald-600 uppercase tracking-wider text-emerald-600">Total Paid</div>
-                        <div id="cust-stat-paid" class="text-2xl font-bold text-emerald-600 mt-1">Rs. 0</div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Total Amount Paid</div>
+                        <div id="cust-stat-paid" class="text-2xl font-black text-emerald-600 mt-1">Rs. 0</div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <div class="text-xs font-medium uppercase tracking-wider text-amber-600">Remaining Balance</div>
-                        <div id="cust-stat-balance" class="text-2xl font-bold text-amber-600 mt-1">Rs. 0</div>
-                    </div>
-                </div>
-
-                <!-- Progress Bar Card -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-3">
-                    <div class="flex justify-between items-center text-sm font-semibold">
-                        <span class="text-slate-700">Repayment Progress</span>
-                        <span id="cust-progress-percent" class="text-emerald-700">0%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden p-0.5 border border-slate-200">
-                        <div id="cust-progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Remaining Balance</div>
+                        <div id="cust-stat-balance" class="text-2xl font-black text-amber-600 mt-1">Rs. 0</div>
                     </div>
                 </div>
 
-                <!-- Payment Schedule Table -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                        <h3 class="font-bold text-slate-800 flex items-center space-x-2">
-                            <i class="fa-solid fa-calendar-days text-emerald-600"></i>
-                            <span>Repayment Schedule & History</span>
+                <!-- Repayment Progress Card -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
+                    <div class="flex justify-between items-center text-xs font-bold">
+                        <span class="text-slate-700 uppercase tracking-wider">Overall Repayment Progress</span>
+                        <span id="cust-progress-percent" class="text-emerald-600 text-sm font-black">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-200">
+                        <div id="cust-progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-[11px] text-slate-400 pt-1">
+                        <span>Paid Installments: <strong id="cust-paid-terms" class="text-slate-700">0</strong></span>
+                        <span>Pending Installments: <strong id="cust-pending-terms" class="text-slate-700">0</strong></span>
+                        <span>Total Terms: <strong id="cust-total-terms" class="text-slate-700">0</strong></span>
+                    </div>
+                </div>
+
+                <!-- Schedule & Payment History Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                            <i class="fa-solid fa-calendar-check text-emerald-600"></i>
+                            <span>Repayment Schedule & Payment History</span>
                         </h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
+                        <table class="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr class="bg-slate-100/70 text-slate-600 font-semibold uppercase text-xs">
-                                    <th class="py-3 px-4">#</th>
+                                <tr class="bg-slate-100/70 text-slate-500 font-bold uppercase tracking-wider">
+                                    <th class="py-3 px-4">Inst #</th>
                                     <th class="py-3 px-4">Due Date</th>
-                                    <th class="py-3 px-4">Amount Due</th>
+                                    <th class="py-3 px-4">Installment</th>
                                     <th class="py-3 px-4">Amount Paid</th>
                                     <th class="py-3 px-4">Paid Date</th>
                                     <th class="py-3 px-4">Status</th>
-                                    <th class="py-3 px-4 text-right no-print">Receipt</th>
+                                    <th class="py-3 px-4">Tx Ref</th>
+                                    <th class="py-3 px-4 text-right no-print">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="cust-schedule-tbody" class="divide-y divide-slate-100">
-                                <!-- Dynamic Rows -->
+                                <!-- Dynamic Installment Rows -->
                             </tbody>
                         </table>
                     </div>
@@ -181,123 +208,163 @@ html
             </div>
         </section>
 
-        <!-- ================= ADMIN PORTAL ================= -->
+        <!-- ================================================================= -->
+        <!-- ADMIN VIEW SECTION                                                -->
+        <!-- ================================================================= -->
         <section id="admin-view" class="hidden space-y-6">
 
-            <!-- Admin Authentication Card -->
-            <div id="admin-login-card" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-                <div class="bg-slate-900 p-6 text-white text-center">
-                    <div class="inline-flex p-3 bg-slate-800 rounded-full mb-3 text-emerald-400">
-                        <i class="fa-solid fa-shield-halved text-3xl"></i>
+            <!-- Admin Authentication Form -->
+            <div id="admin-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden mt-6">
+                <div class="bg-slate-900 p-8 text-white text-center relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-slate-800 rounded-full blur-2xl"></div>
+                    <div class="inline-flex p-4 bg-slate-800 text-emerald-400 rounded-2xl mb-4 border border-slate-700">
+                        <i class="fa-solid fa-lock-open text-3xl"></i>
                     </div>
-                    <h2 class="text-2xl font-bold">Admin Portal Login</h2>
-                    <p class="text-slate-400 text-sm mt-1">Management Portal Access</p>
+                    <h2 class="text-2xl font-extrabold tracking-tight">Admin Portal</h2>
+                    <p class="text-slate-400 text-xs mt-1.5">Authorized loan officers only</p>
                 </div>
 
-                <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="p-6 space-y-4">
+                <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="p-6 sm:p-8 space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Admin Security Password</label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                <i class="fa-solid fa-lock"></i>
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <i class="fa-solid fa-user text-sm"></i>
                             </span>
-                            <input type="password" id="admin-pass" required placeholder="Enter admin password" 
-                                class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <input type="text" id="admin-username" required placeholder="admin" 
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 font-semibold transition">
                         </div>
                     </div>
 
-                    <div id="admin-login-error" class="hidden p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm text-center"></div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <i class="fa-solid fa-key text-sm"></i>
+                            </span>
+                            <input type="password" id="admin-pass" required placeholder="••••••••" 
+                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 transition">
+                        </div>
+                        <div class="flex justify-between items-center text-[11px] text-slate-400 mt-2">
+                            <span>Default: admin / admin10</span>
+                        </div>
+                    </div>
 
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2">
-                        <span>Authenticate</span>
-                        <i class="fa-solid fa-key"></i>
+                    <div id="admin-login-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-xs font-medium text-center"></div>
+
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
+                        <span>Authenticate & Access</span>
+                        <i class="fa-solid fa-right-to-bracket text-sm"></i>
                     </button>
                 </form>
             </div>
 
-            <!-- Admin Dashboard Content (Initially Hidden) -->
+            <!-- Admin Dashboard Screen (Initially Hidden) -->
             <div id="admin-dashboard" class="hidden space-y-6">
-                <!-- Admin Header & Actions -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <!-- Admin Control Header -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-900">Portfolio Management</h2>
-                        <p class="text-sm text-slate-500">System Overview & Loans Administration (PKR)</p>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase tracking-wider">Live System</span>
+                            <h2 class="text-2xl font-black text-slate-900">Portfolio Overview</h2>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Manage customers, generate schedules, and log collections in Pakistani Rupees (PKR).</p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <button onclick="openModal('add-loan-modal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm transition flex items-center space-x-2">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>New Loan</span>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <button onclick="openModal('add-loan-modal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-plus"></i>
+                            <span>New Loan Account</span>
                         </button>
-                        <button onclick="exportToCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium transition flex items-center space-x-2">
+                        <button onclick="exportToCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
                             <i class="fa-solid fa-file-csv text-emerald-600"></i>
-                            <span>Export Data</span>
+                            <span>Export CSV</span>
                         </button>
-                        <button onclick="logoutAdmin()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg text-sm font-medium transition">
-                            <i class="fa-solid fa-right-from-bracket"></i>
+                        <button onclick="openModal('admin-settings-modal')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Settings</span>
+                        </button>
+                        <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1">
+                            <i class="fa-solid fa-power-off"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Metrics Widgets -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Portfolio</div>
-                        <div id="admin-stat-portfolio" class="text-2xl font-bold text-slate-900 mt-1">Rs. 0</div>
+                <!-- Admin Executive Metrics -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Registered Accounts</div>
+                        <div id="admin-stat-customers" class="text-2xl font-black text-slate-900 mt-1">0</div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <div class="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Collected Amount</div>
-                        <div id="admin-stat-collected" class="text-2xl font-bold text-emerald-600 mt-1">Rs. 0</div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Portfolio</div>
+                        <div id="admin-stat-portfolio" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <div class="text-xs font-semibold text-amber-600 uppercase tracking-wider">Outstanding Outstanding</div>
-                        <div id="admin-stat-outstanding" class="text-2xl font-bold text-amber-600 mt-1">Rs. 0</div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Total Collected</div>
+                        <div id="admin-stat-collected" class="text-2xl font-black text-emerald-600 mt-1">Rs. 0</div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
-                        <div class="text-xs font-semibold text-red-600 uppercase tracking-wider">Overdue Installments</div>
-                        <div id="admin-stat-overdue-count" class="text-2xl font-bold text-red-600 mt-1">0</div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Total Outstanding</div>
+                        <div id="admin-stat-outstanding" class="text-2xl font-black text-amber-600 mt-1">Rs. 0</div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <div class="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Overdue Installments</div>
+                        <div id="admin-stat-overdue-count" class="text-2xl font-black text-rose-600 mt-1">0</div>
                     </div>
                 </div>
 
-                <!-- Charts Section -->
+                <!-- Chart Visualizations -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                        <h3 class="font-bold text-slate-800 text-sm mb-4">Portfolio Collection Status</h3>
-                        <div class="h-64 relative flex items-center justify-center">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 flex items-center justify-between">
+                            <span>Portfolio Recovery Progress</span>
+                            <i class="fa-solid fa-chart-pie text-emerald-600"></i>
+                        </h3>
+                        <div class="h-56 relative">
                             <canvas id="chart-portfolio"></canvas>
                         </div>
                     </div>
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                        <h3 class="font-bold text-slate-800 text-sm mb-4">Loans Breakdown by Type</h3>
-                        <div class="h-64 relative flex items-center justify-center">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
+                        <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 flex items-center justify-between">
+                            <span>Loan Frequency Breakdown</span>
+                            <i class="fa-solid fa-chart-bar text-teal-600"></i>
+                        </h3>
+                        <div class="h-56 relative">
                             <canvas id="chart-loantypes"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- Loans Table Container -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50">
-                        <h3 class="font-bold text-slate-800 flex items-center space-x-2">
+                <!-- Admin Main Loans Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                    <div class="p-4 sm:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
                             <i class="fa-solid fa-list-check text-emerald-600"></i>
                             <span>All Loan Accounts</span>
                         </h3>
                         <div class="w-full sm:w-auto flex items-center space-x-2">
-                            <input type="text" id="admin-search" oninput="renderAdminLoansTable()" placeholder="Search Name, ID, Phone..." 
-                                class="px-3 py-1.5 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 w-full sm:w-64">
+                            <div class="relative w-full sm:w-64">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                </span>
+                                <input type="text" id="admin-search" oninput="renderAdminLoansTable()" placeholder="Search Name, ID, PIN..." 
+                                    class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500">
+                            </div>
                         </div>
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse text-sm">
+                        <table class="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr class="bg-slate-100/70 text-slate-600 font-semibold uppercase text-xs">
+                                <tr class="bg-slate-100/70 text-slate-500 font-bold uppercase tracking-wider">
                                     <th class="py-3 px-4">Loan ID</th>
-                                    <th class="py-3 px-4">Borrower</th>
-                                    <th class="py-3 px-4">PIN</th>
+                                    <th class="py-3 px-4">Borrower Details</th>
+                                    <th class="py-3 px-4">4-Digit PIN</th>
                                     <th class="py-3 px-4">Principal</th>
                                     <th class="py-3 px-4">Total Due</th>
                                     <th class="py-3 px-4">Paid</th>
                                     <th class="py-3 px-4">Progress</th>
+                                    <th class="py-3 px-4">Status</th>
                                     <th class="py-3 px-4 text-right">Actions</th>
                                 </tr>
                             </thead>
@@ -308,13 +375,13 @@ html
                     </div>
                 </div>
 
-                <!-- System Audit Logs -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
-                    <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-                        <i class="fa-solid fa-clock-rotate-left text-slate-500"></i>
-                        <span>System Activity & Audit Log</span>
+                <!-- System Audit Trail -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 space-y-3">
+                    <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center space-x-2">
+                        <i class="fa-solid fa-clock-rotate-left text-slate-400"></i>
+                        <span>System Audit Logs</span>
                     </h3>
-                    <div id="audit-log-container" class="max-h-48 overflow-y-auto space-y-2 text-xs font-mono text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div id="audit-log-container" class="max-h-40 overflow-y-auto space-y-1.5 text-[11px] font-mono text-slate-600 bg-slate-900 text-emerald-400 p-4 rounded-xl">
                         <!-- Dynamic Logs -->
                     </div>
                 </div>
@@ -323,18 +390,20 @@ html
 
     </main>
 
-    <!-- Footer -->
+    <!-- FOOTER -->
     <footer class="bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800 no-print mt-auto">
-        <p>&copy; 2026 PakLoan Check Portal & Management System. All Rights Reserved (PKR Currency).</p>
+        <p>&copy; 2026 PakLoan Check Portal & Loan Management System. PKR Currency Mode.</p>
     </footer>
 
-    <!-- ================= MODALS ================= -->
+    <!-- ================================================================= -->
+    <!-- MODALS SECTION                                                    -->
+    <!-- ================================================================= -->
 
-    <!-- Add/Edit Loan Modal -->
+    <!-- Add/Edit Loan Account Modal -->
     <div id="add-loan-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 id="loan-modal-title" class="text-lg font-bold text-slate-800">Create New Loan Account</h3>
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 id="loan-modal-title" class="text-base font-bold text-slate-900">Create Loan Account</h3>
                 <button onclick="closeModal('add-loan-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
             </div>
             
@@ -343,61 +412,61 @@ html
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Loan Account ID</label>
-                        <input type="text" id="form-loan-id" required placeholder="PKL-1001" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Loan Account ID</label>
+                        <input type="text" id="form-loan-id" required placeholder="L-1003" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-mono font-bold uppercase">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Borrower Full Name</label>
-                        <input type="text" id="form-customer-name" required placeholder="Muhammad Ali" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Borrower Full Name</label>
+                        <input type="text" id="form-customer-name" required placeholder="Zubair Ahmed" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Phone Number</label>
-                        <input type="text" id="form-phone" required placeholder="0300-1234567" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number</label>
+                        <input type="text" id="form-phone" required placeholder="0300-1234567" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">4-Digit Verification PIN</label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">4-Digit Security PIN</label>
                         <div class="flex space-x-2">
-                            <input type="text" id="form-pin" maxlength="4" pattern="\d{4}" required placeholder="1234" class="w-full px-3 py-2 border rounded-lg text-sm font-mono tracking-widest">
-                            <button type="button" onclick="generateRandomPin()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg">Auto</button>
+                            <input type="text" id="form-pin" maxlength="4" pattern="\d{4}" required placeholder="1234" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-mono tracking-widest text-center font-bold">
+                            <button type="button" onclick="generateRandomPin()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl whitespace-nowrap">Auto</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Principal (PKR)</label>
-                        <input type="number" id="form-principal" required min="1000" step="1000" placeholder="100000" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Principal (PKR)</label>
+                        <input type="number" id="form-principal" required min="1000" step="1000" placeholder="100000" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Interest Rate (%)</label>
-                        <input type="number" id="form-rate" required min="0" step="0.5" placeholder="10" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Markup / Interest (%)</label>
+                        <input type="number" id="form-rate" required min="0" step="0.5" placeholder="10" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Term Count</label>
-                        <input type="number" id="form-terms" required min="1" max="60" placeholder="6" class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Total Terms / Insts</label>
+                        <input type="number" id="form-terms" required min="1" max="60" placeholder="6" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Repayment Frequency</label>
-                        <select id="form-frequency" class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Repayment Frequency</label>
+                        <select id="form-frequency" class="w-full px-3.5 py-2.5 border rounded-xl text-xs bg-white font-semibold">
                             <option value="monthly">Monthly</option>
                             <option value="weekly">Weekly</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Start Date</label>
-                        <input type="date" id="form-start-date" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Start / Approval Date</label>
+                        <input type="date" id="form-start-date" required class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
                     </div>
                 </div>
 
                 <div class="pt-4 border-t flex justify-end space-x-3">
-                    <button type="button" onclick="closeModal('add-loan-modal')" class="px-4 py-2 border rounded-lg text-sm font-medium hover:bg-slate-50">Cancel</button>
-                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold shadow-sm">Save Account</button>
+                    <button type="button" onclick="closeModal('add-loan-modal')" class="px-4 py-2.5 border rounded-xl text-xs font-bold hover:bg-slate-50">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20">Save & Generate Schedule</button>
                 </div>
             </form>
         </div>
@@ -405,9 +474,9 @@ html
 
     <!-- Record Payment Modal -->
     <div id="payment-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h3 class="text-lg font-bold text-slate-800">Record Installment Payment</h3>
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 class="text-base font-bold text-slate-900">Record Installment Payment</h3>
                 <button onclick="closeModal('payment-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
             </div>
 
@@ -415,24 +484,29 @@ html
                 <input type="hidden" id="pay-loan-id">
                 <input type="hidden" id="pay-installment-index">
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Due Amount</label>
-                    <div id="pay-due-display" class="text-xl font-bold text-slate-800">Rs. 0</div>
+                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase">Target Due Amount</div>
+                    <div id="pay-due-display" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Payment Amount (PKR)</label>
-                    <input type="number" id="pay-amount" required min="1" step="1" class="w-full px-3 py-2 border rounded-lg text-sm">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Payment Amount (PKR)</label>
+                    <input type="number" id="pay-amount" required min="1" step="1" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Payment Date</label>
-                    <input type="date" id="pay-date" required class="w-full px-3 py-2 border rounded-lg text-sm">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Payment Date</label>
+                    <input type="date" id="pay-date" required class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Transaction Ref / Cheque #</label>
+                    <input type="text" id="pay-txref" placeholder="TXN-998822" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
                 </div>
 
                 <div class="pt-4 border-t flex justify-end space-x-3">
-                    <button type="button" onclick="closeModal('payment-modal')" class="px-4 py-2 border rounded-lg text-sm font-medium">Cancel</button>
-                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold">Submit Payment</button>
+                    <button type="button" onclick="closeModal('payment-modal')" class="px-4 py-2.5 border rounded-xl text-xs font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20">Record Payment</button>
                 </div>
             </form>
         </div>
@@ -440,36 +514,37 @@ html
 
     <!-- Printable Receipt Modal -->
     <div id="receipt-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-            <div id="receipt-printable" class="p-6 space-y-4 font-mono text-xs">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div id="receipt-printable" class="p-8 space-y-4 font-mono text-xs">
                 <div class="text-center border-b pb-4">
-                    <h2 class="text-lg font-bold text-slate-900">PAKLOAN MANAGEMENT</h2>
-                    <p class="text-slate-500">Official Payment Receipt</p>
-                    <p class="text-[10px] text-slate-400 mt-1">Receipt #: <span id="rec-id">--</span></p>
+                    <h2 class="text-lg font-black tracking-tight text-slate-900">PAKLOAN MANAGEMENT</h2>
+                    <p class="text-slate-500 text-[10px]">Official Payment Collection Receipt</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Receipt Ref: <span id="rec-id">--</span></p>
                 </div>
 
-                <div class="space-y-1.5 text-slate-700">
-                    <div class="flex justify-between"><span>Date:</span> <span id="rec-date" class="font-bold">--</span></div>
-                    <div class="flex justify-between"><span>Borrower:</span> <span id="rec-name" class="font-bold">--</span></div>
-                    <div class="flex justify-between"><span>Loan ID:</span> <span id="rec-loan-id" class="font-bold">--</span></div>
+                <div class="space-y-2 text-slate-700">
+                    <div class="flex justify-between"><span>Payment Date:</span> <span id="rec-date" class="font-bold">--</span></div>
+                    <div class="flex justify-between"><span>Borrower Name:</span> <span id="rec-name" class="font-bold">--</span></div>
+                    <div class="flex justify-between"><span>Loan Account ID:</span> <span id="rec-loan-id" class="font-bold">--</span></div>
                     <div class="flex justify-between"><span>Installment #:</span> <span id="rec-num" class="font-bold">--</span></div>
+                    <div class="flex justify-between"><span>Transaction Ref:</span> <span id="rec-txref" class="font-bold">--</span></div>
                 </div>
 
                 <div class="border-t border-b py-3 my-2 space-y-1">
-                    <div class="flex justify-between text-sm font-bold text-slate-900">
+                    <div class="flex justify-between text-sm font-black text-slate-900">
                         <span>Paid Amount:</span>
                         <span id="rec-amount">Rs. 0</span>
                     </div>
                 </div>
 
                 <div class="text-center text-[10px] text-slate-400 pt-2">
-                    Thank you for your payment!
+                    Thank you for your prompt payment.
                 </div>
             </div>
 
             <div class="p-4 bg-slate-50 border-t flex justify-between items-center no-print">
-                <button onclick="closeModal('receipt-modal')" class="px-4 py-2 border rounded-lg text-xs font-medium">Close</button>
-                <button onclick="window.print()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center space-x-1">
+                <button onclick="closeModal('receipt-modal')" class="px-4 py-2 border rounded-xl text-xs font-bold">Close</button>
+                <button onclick="window.print()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-md">
                     <i class="fa-solid fa-print"></i>
                     <span>Print Receipt</span>
                 </button>
@@ -477,25 +552,61 @@ html
         </div>
     </div>
 
-    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <!-- Admin Settings & Security Modal -->
+    <div id="admin-settings-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h3 class="text-base font-bold text-slate-900">Admin Security Settings</h3>
+                <button onclick="closeModal('admin-settings-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+            </div>
+
+            <div class="p-6 space-y-6">
+                <!-- Change Password Form -->
+                <form onsubmit="handleChangeAdminPassword(event)" class="space-y-3 border-b pb-5">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">Change Admin Password</h4>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">New Admin Password</label>
+                        <input type="password" id="new-admin-pass" required placeholder="Enter new password" class="w-full px-3.5 py-2 border rounded-xl text-xs">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs shadow">Update Password</button>
+                </form>
+
+                <!-- Reset Data Button -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-rose-600">Database Operations</h4>
+                    <p class="text-[11px] text-slate-500">Reset system back to default sample records and restore credentials to <strong class="text-slate-700">admin / admin10</strong>.</p>
+                    <button onclick="resetSampleData()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold py-2.5 rounded-xl text-xs transition">
+                        Reset All Sample Data & Credentials
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- JAVASCRIPT APP LOGIC                                              -->
+    <!-- ================================================================= -->
     <script>
         // --- CONSTANTS & STATE ---
-        // Secure Hashed Admin Password (SHA-256 hash of "admin123")
-        const SECURE_ADMIN_HASH = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
-        
+        const DEFAULT_ADMIN_USER = "admin";
+        const DEFAULT_ADMIN_PASS = "admin10";
+
         let loansData = [];
         let auditLogs = [];
+        let adminCreds = { user: DEFAULT_ADMIN_USER, pass: DEFAULT_ADMIN_PASS };
+
         let activeView = 'customer';
         let currentCustomerLoan = null;
+
         let chartPortfolioInstance = null;
         let chartTypesInstance = null;
 
-        // --- SEED SAMPLE DATA (PKR) ---
+        // --- SAMPLE DEFAULT SEED DATA (PKR) ---
         const sampleSeedLoans = [
             {
-                id: "PKL-1001",
-                customerName: "Tariq Mahmood",
-                phone: "0300-5550192",
+                id: "L-1001",
+                customerName: "Muhammad Ali",
+                phone: "0300-1234567",
                 pin: "1234",
                 principal: 150000,
                 rate: 10,
@@ -503,17 +614,17 @@ html
                 frequency: "monthly",
                 startDate: "2026-01-01",
                 schedule: [
-                    { num: 1, dueDate: "2026-02-01", amount: 27500, paidAmount: 27500, paidDate: "2026-01-28", status: "Paid" },
-                    { num: 2, dueDate: "2026-03-01", amount: 27500, paidAmount: 27500, paidDate: "2026-02-28", status: "Paid" },
-                    { num: 3, dueDate: "2026-04-01", amount: 27500, paidAmount: 0, paidDate: null, status: "Pending" },
-                    { num: 4, dueDate: "2026-05-01", amount: 27500, paidAmount: 0, paidDate: null, status: "Upcoming" },
-                    { num: 5, dueDate: "2026-06-01", amount: 27500, paidAmount: 0, paidDate: null, status: "Upcoming" },
-                    { num: 6, dueDate: "2026-07-01", amount: 27500, paidAmount: 0, paidDate: null, status: "Upcoming" }
+                    { num: 1, dueDate: "2026-02-01", amount: 27500, paidAmount: 27500, paidDate: "2026-01-28", txRef: "TXN-10029", status: "Paid" },
+                    { num: 2, dueDate: "2026-03-01", amount: 27500, paidAmount: 27500, paidDate: "2026-02-28", txRef: "TXN-11048", status: "Paid" },
+                    { num: 3, dueDate: "2026-04-01", amount: 27500, paidAmount: 0, paidDate: null, txRef: "", status: "Pending" },
+                    { num: 4, dueDate: "2026-05-01", amount: 27500, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" },
+                    { num: 5, dueDate: "2026-06-01", amount: 27500, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" },
+                    { num: 6, dueDate: "2026-07-01", amount: 27500, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" }
                 ]
             },
             {
-                id: "PKL-1002",
-                customerName: "Fatima Khan",
+                id: "L-1002",
+                customerName: "Ayesha Khan",
                 phone: "0321-9876543",
                 pin: "4321",
                 principal: 80000,
@@ -522,67 +633,77 @@ html
                 frequency: "monthly",
                 startDate: "2026-02-01",
                 schedule: [
-                    { num: 1, dueDate: "2026-03-01", amount: 21600, paidAmount: 21600, paidDate: "2026-03-01", status: "Paid" },
-                    { num: 2, dueDate: "2026-04-01", amount: 21600, paidAmount: 10000, paidDate: "2026-04-02", status: "Partially Paid" },
-                    { num: 3, dueDate: "2026-05-01", amount: 21600, paidAmount: 0, paidDate: null, status: "Upcoming" },
-                    { num: 4, dueDate: "2026-06-01", amount: 21600, paidAmount: 0, paidDate: null, status: "Upcoming" }
+                    { num: 1, dueDate: "2026-03-01", amount: 21600, paidAmount: 21600, paidDate: "2026-03-01", txRef: "TXN-88412", status: "Paid" },
+                    { num: 2, dueDate: "2026-04-01", amount: 21600, paidAmount: 10000, paidDate: "2026-04-02", txRef: "TXN-90112", status: "Partially Paid" },
+                    { num: 3, dueDate: "2026-05-01", amount: 21600, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" },
+                    { num: 4, dueDate: "2026-06-01", amount: 21600, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" }
                 ]
             }
         ];
 
-        // --- INITIALIZATION ---
+        // --- APP INITIALIZATION ---
         window.onload = function() {
             loadStorage();
             
-            // Set default date picker to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('form-start-date').value = today;
             document.getElementById('pay-date').value = today;
 
-            logAudit("System initialized with PKR currency mode.");
+            logAudit("System initialized in PKR currency mode.");
         };
 
-        // --- STORAGE MANAGEMENT ---
+        // --- STORAGE & LOGGING ---
         function loadStorage() {
-            const stored = localStorage.getItem('pakloan_data');
-            if (stored) {
-                try {
-                    loansData = JSON.parse(stored);
-                } catch(e) {
-                    loansData = sampleSeedLoans;
-                }
+            const storedData = localStorage.getItem('pakloan_data');
+            if (storedData) {
+                try { loansData = JSON.parse(storedData); } catch(e) { loansData = sampleSeedLoans; }
             } else {
                 loansData = sampleSeedLoans;
                 saveStorage();
             }
 
-            const logs = localStorage.getItem('pakloan_logs');
-            if (logs) {
-                try { auditLogs = JSON.parse(logs); } catch(e) { auditLogs = []; }
+            const storedCreds = localStorage.getItem('pakloan_admin_creds');
+            if (storedCreds) {
+                try { adminCreds = JSON.parse(storedCreds); } catch(e) { adminCreds = { user: DEFAULT_ADMIN_USER, pass: DEFAULT_ADMIN_PASS }; }
+            } else {
+                adminCreds = { user: DEFAULT_ADMIN_USER, pass: DEFAULT_ADMIN_PASS };
+                localStorage.setItem('pakloan_admin_creds', JSON.stringify(adminCreds));
+            }
+
+            const storedLogs = localStorage.getItem('pakloan_logs');
+            if (storedLogs) {
+                try { auditLogs = JSON.parse(storedLogs); } catch(e) { auditLogs = []; }
             }
         }
 
         function saveStorage() {
             localStorage.setItem('pakloan_data', JSON.stringify(loansData));
             localStorage.setItem('pakloan_logs', JSON.stringify(auditLogs));
+            localStorage.setItem('pakloan_admin_creds', JSON.stringify(adminCreds));
         }
 
-        function logAudit(message) {
-            const timestamp = new Date().toLocaleString();
-            auditLogs.unshift(`[${timestamp}] ${message}`);
-            if (auditLogs.length > 50) auditLogs.pop();
+        function logAudit(msg) {
+            const time = new Date().toLocaleTimeString();
+            auditLogs.unshift(`[${time}] ${msg}`);
+            if (auditLogs.length > 40) auditLogs.pop();
             saveStorage();
             renderAuditLogs();
         }
 
-        // --- UTILITY FUNCTIONS ---
-        function formatPKR(val) {
-            return 'Rs. ' + Number(val || 0).toLocaleString('en-PK', { maximumFractionDigits: 0 });
+        function resetSampleData() {
+            if (confirm("Reset system back to default sample records and credentials (admin / admin10)?")) {
+                loansData = sampleSeedLoans;
+                adminCreds = { user: DEFAULT_ADMIN_USER, pass: DEFAULT_ADMIN_PASS };
+                auditLogs = [];
+                saveStorage();
+                alert("Data restored successfully!");
+                location.reload();
+            }
         }
 
-        async function sha256(str) {
-            const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
-            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        // --- FORMATTERS & HELPERS ---
+        function formatPKR(amount) {
+            return 'Rs. ' + Number(amount || 0).toLocaleString('en-PK', { maximumFractionDigits: 0 });
         }
 
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
@@ -602,13 +723,13 @@ html
             const adminView = document.getElementById('admin-view');
 
             if (view === 'customer') {
-                custBtn.className = "px-3 py-1.5 rounded-md text-sm font-medium bg-emerald-700 text-white hover:bg-emerald-600 transition";
-                adminBtn.className = "px-3 py-1.5 rounded-md text-sm font-medium text-emerald-100 hover:bg-emerald-700 transition";
+                custBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-md transition flex items-center space-x-1.5";
+                adminBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition flex items-center space-x-1.5";
                 custView.classList.remove('hidden');
                 adminView.classList.add('hidden');
             } else {
-                adminBtn.className = "px-3 py-1.5 rounded-md text-sm font-medium bg-emerald-700 text-white hover:bg-emerald-600 transition";
-                custBtn.className = "px-3 py-1.5 rounded-md text-sm font-medium text-emerald-100 hover:bg-emerald-700 transition";
+                adminBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-md transition flex items-center space-x-1.5";
+                custBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition flex items-center space-x-1.5";
                 adminView.classList.remove('hidden');
                 custView.classList.add('hidden');
             }
@@ -629,7 +750,7 @@ html
                 document.getElementById('customer-login-card').classList.add('hidden');
                 document.getElementById('customer-dashboard').classList.remove('hidden');
                 renderCustomerDashboard();
-                logAudit(`Customer accessed loan ${loan.id}`);
+                logAudit(`Customer lookup success for Loan ID ${loan.id}`);
             } else {
                 errorEl.textContent = "Invalid Loan Account ID or 4-Digit Security PIN.";
                 errorEl.classList.remove('hidden');
@@ -643,13 +764,16 @@ html
             document.getElementById('cust-dash-name').textContent = l.customerName;
             document.getElementById('cust-dash-id').textContent = l.id;
             document.getElementById('cust-dash-phone').textContent = l.phone;
+            document.getElementById('cust-dash-approval').textContent = l.startDate;
 
             let totalPayable = 0;
             let totalPaid = 0;
+            let paidTerms = 0;
 
             l.schedule.forEach(item => {
                 totalPayable += item.amount;
                 totalPaid += item.paidAmount;
+                if (item.status === 'Paid') paidTerms++;
             });
 
             const remaining = Math.max(0, totalPayable - totalPaid);
@@ -663,6 +787,10 @@ html
             document.getElementById('cust-progress-percent').textContent = `${progress}%`;
             document.getElementById('cust-progress-bar').style.width = `${progress}%`;
 
+            document.getElementById('cust-paid-terms').textContent = paidTerms;
+            document.getElementById('cust-pending-terms').textContent = l.schedule.length - paidTerms;
+            document.getElementById('cust-total-terms').textContent = l.schedule.length;
+
             // Render Schedule Table
             const tbody = document.getElementById('cust-schedule-tbody');
             tbody.innerHTML = '';
@@ -671,23 +799,24 @@ html
                 let badgeClass = "bg-slate-100 text-slate-700";
                 if (item.status === 'Paid') badgeClass = "bg-emerald-100 text-emerald-800";
                 else if (item.status === 'Pending') badgeClass = "bg-amber-100 text-amber-800";
-                else if (item.status === 'Overdue') badgeClass = "bg-red-100 text-red-800";
-                else if (item.status === 'Partially Paid') badgeClass = "bg-blue-100 text-blue-800";
+                else if (item.status === 'Overdue') badgeClass = "bg-rose-100 text-rose-800";
+                else if (item.status === 'Partially Paid') badgeClass = "bg-sky-100 text-sky-800";
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="py-3 px-4 font-medium">${item.num}</td>
-                    <td class="py-3 px-4">${item.dueDate}</td>
-                    <td class="py-3 px-4 font-semibold">${formatPKR(item.amount)}</td>
-                    <td class="py-3 px-4 font-semibold text-emerald-600">${formatPKR(item.paidAmount)}</td>
+                    <td class="py-3 px-4 font-bold text-slate-700">${item.num}</td>
+                    <td class="py-3 px-4 font-semibold">${item.dueDate}</td>
+                    <td class="py-3 px-4 font-bold">${formatPKR(item.amount)}</td>
+                    <td class="py-3 px-4 font-bold text-emerald-600">${formatPKR(item.paidAmount)}</td>
                     <td class="py-3 px-4 text-slate-500">${item.paidDate || '-'}</td>
                     <td class="py-3 px-4">
-                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full ${badgeClass}">${item.status}</span>
+                        <span class="px-2.5 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider ${badgeClass}">${item.status}</span>
                     </td>
+                    <td class="py-3 px-4 font-mono text-slate-500">${item.txRef || '-'}</td>
                     <td class="py-3 px-4 text-right no-print">
                         ${item.paidAmount > 0 ? `
-                            <button onclick="showReceipt('${l.id}', ${item.num})" class="text-xs text-emerald-600 hover:text-emerald-800 font-semibold flex items-center space-x-1 justify-end">
+                            <button onclick="showReceipt('${l.id}', ${item.num})" class="text-xs text-emerald-600 hover:text-emerald-800 font-bold inline-flex items-center space-x-1">
                                 <i class="fa-solid fa-receipt"></i>
                                 <span>Receipt</span>
                             </button>
@@ -706,28 +835,37 @@ html
             document.getElementById('customer-login-card').classList.remove('hidden');
         }
 
-        function printCustomerStatement() {
-            window.print();
-        }
-
-        // --- ADMIN PORTAL LOGIC ---
-        async function handleAdminLogin(e) {
+        // --- ADMIN AUTHENTICATION ---
+        function handleAdminLogin(e) {
             e.preventDefault();
-            const pass = document.getElementById('admin-pass').value;
+            const userInput = document.getElementById('admin-username').value.trim();
+            const passInput = document.getElementById('admin-pass').value.trim();
             const errorEl = document.getElementById('admin-login-error');
 
-            const hashedInput = await sha256(pass);
-
-            if (hashedInput === SECURE_ADMIN_HASH) {
+            if (userInput === adminCreds.user && passInput === adminCreds.pass) {
                 errorEl.classList.add('hidden');
                 document.getElementById('admin-login-card').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.remove('hidden');
                 renderAdminDashboard();
-                logAudit("Admin authenticated successfully.");
+                logAudit("Admin login authenticated successfully.");
             } else {
-                errorEl.textContent = "Invalid Admin Credentials.";
+                errorEl.textContent = "Invalid Admin Username or Password.";
                 errorEl.classList.remove('hidden');
             }
+        }
+
+        function handleChangeAdminPassword(e) {
+            e.preventDefault();
+            const newPass = document.getElementById('new-admin-pass').value.trim();
+            if (newPass.length < 4) {
+                alert("Password must be at least 4 characters long.");
+                return;
+            }
+            adminCreds.pass = newPass;
+            saveStorage();
+            logAudit("Admin password updated.");
+            alert("Admin password updated successfully!");
+            closeModal('admin-settings-modal');
         }
 
         function logoutAdmin() {
@@ -736,6 +874,7 @@ html
             document.getElementById('admin-login-card').classList.remove('hidden');
         }
 
+        // --- ADMIN DASHBOARD RENDERERS ---
         function renderAdminDashboard() {
             renderAdminMetrics();
             renderAdminLoansTable();
@@ -758,6 +897,7 @@ html
 
             const outstanding = Math.max(0, totalPortfolio - totalCollected);
 
+            document.getElementById('admin-stat-customers').textContent = loansData.length;
             document.getElementById('admin-stat-portfolio').textContent = formatPKR(totalPortfolio);
             document.getElementById('admin-stat-collected').textContent = formatPKR(totalCollected);
             document.getElementById('admin-stat-outstanding').textContent = formatPKR(outstanding);
@@ -772,6 +912,7 @@ html
             const filtered = loansData.filter(l => 
                 l.id.toLowerCase().includes(query) ||
                 l.customerName.toLowerCase().includes(query) ||
+                l.pin.includes(query) ||
                 l.phone.includes(query)
             );
 
@@ -785,36 +926,40 @@ html
                 });
 
                 const progress = totalDue > 0 ? Math.round((totalPaid / totalDue) * 100) : 0;
+                const statusBadge = progress >= 100 ? 
+                    '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase">Completed</span>' :
+                    '<span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold text-[10px] uppercase">Active</span>';
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="py-3 px-4 font-mono font-bold text-slate-800">${l.id}</td>
+                    <td class="py-3 px-4 font-mono font-bold text-slate-900">${l.id}</td>
                     <td class="py-3 px-4">
-                        <div class="font-semibold text-slate-800">${l.customerName}</div>
-                        <div class="text-xs text-slate-400">${l.phone}</div>
+                        <div class="font-bold text-slate-900">${l.customerName}</div>
+                        <div class="text-[11px] text-slate-400">${l.phone}</div>
                     </td>
-                    <td class="py-3 px-4 font-mono text-xs font-semibold text-slate-600 bg-slate-50 px-2 py-1 rounded inline-block my-2 border">${l.pin}</td>
-                    <td class="py-3 px-4 font-semibold">${formatPKR(l.principal)}</td>
-                    <td class="py-3 px-4 text-slate-700">${formatPKR(totalDue)}</td>
-                    <td class="py-3 px-4 font-semibold text-emerald-600">${formatPKR(totalPaid)}</td>
+                    <td class="py-3 px-4 font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-center border">${l.pin}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${formatPKR(l.principal)}</td>
+                    <td class="py-3 px-4 text-slate-600 font-semibold">${formatPKR(totalDue)}</td>
+                    <td class="py-3 px-4 font-bold text-emerald-600">${formatPKR(totalPaid)}</td>
                     <td class="py-3 px-4">
                         <div class="flex items-center space-x-2">
                             <div class="w-16 bg-slate-200 rounded-full h-2">
                                 <div class="bg-emerald-600 h-2 rounded-full" style="width: ${progress}%"></div>
                             </div>
-                            <span class="text-xs font-semibold text-slate-600">${progress}%</span>
+                            <span class="text-[11px] font-bold text-slate-600">${progress}%</span>
                         </div>
                     </td>
+                    <td class="py-3 px-4">${statusBadge}</td>
                     <td class="py-3 px-4 text-right">
-                        <div class="flex items-center justify-end space-x-2">
-                            <button onclick="openPaymentModalForLoan('${l.id}')" title="Record Payment" class="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg">
+                        <div class="flex items-center justify-end space-x-1.5">
+                            <button onclick="openPaymentModalForLoan('${l.id}')" title="Record Payment" class="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg transition">
                                 <i class="fa-solid fa-cash-register"></i>
                             </button>
-                            <button onclick="editLoan('${l.id}')" title="Edit Loan" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg">
+                            <button onclick="editLoan('${l.id}')" title="Edit Loan" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg transition">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button onclick="deleteLoan('${l.id}')" title="Delete Account" class="p-1.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg">
+                            <button onclick="deleteLoan('${l.id}')" title="Delete Account" class="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -824,7 +969,7 @@ html
             });
         }
 
-        // --- AUTO-SCHEDULE GENERATOR ---
+        // --- AUTOMATED SCHEDULE GENERATOR ---
         function generateSchedule(principal, annualRate, terms, frequency, startDateStr) {
             const schedule = [];
             const totalInterest = (principal * (annualRate / 100));
@@ -846,6 +991,7 @@ html
                     amount: installmentAmount,
                     paidAmount: 0,
                     paidDate: null,
+                    txRef: "",
                     status: 'Upcoming'
                 });
             }
@@ -853,7 +999,7 @@ html
             return schedule;
         }
 
-        // --- LOAN FORM ACTIONS ---
+        // --- LOAN CRUD LOGIC ---
         function handleSaveLoan(e) {
             e.preventDefault();
             const mode = document.getElementById('form-loan-mode').value;
@@ -869,7 +1015,7 @@ html
 
             if (mode === 'create') {
                 if (loansData.some(l => l.id === loanId)) {
-                    alert('Loan ID already exists!');
+                    alert('Loan Account ID already exists!');
                     return;
                 }
 
@@ -887,14 +1033,14 @@ html
                 };
 
                 loansData.push(newLoan);
-                logAudit(`Created loan account ${loanId} for ${name}`);
+                logAudit(`Created loan account ${loanId} for ${name} (PIN: ${pin})`);
             } else {
                 const loan = loansData.find(l => l.id === loanId);
                 if (loan) {
                     loan.customerName = name;
                     loan.phone = phone;
                     loan.pin = pin;
-                    logAudit(`Updated details for loan account ${loanId}`);
+                    logAudit(`Updated customer details for ${loanId}`);
                 }
             }
 
@@ -937,7 +1083,6 @@ html
             const loan = loansData.find(l => l.id === id);
             if (!loan) return;
 
-            // Find first pending or unpaid installment
             const instIndex = loan.schedule.findIndex(s => s.status !== 'Paid');
             if (instIndex === -1) {
                 alert('All installments for this loan are fully paid!');
@@ -960,6 +1105,7 @@ html
             const idx = parseInt(document.getElementById('pay-installment-index').value);
             const amount = parseFloat(document.getElementById('pay-amount').value);
             const date = document.getElementById('pay-date').value;
+            const txRef = document.getElementById('pay-txref').value.trim() || `TXN-${Math.floor(10000 + Math.random() * 90000)}`;
 
             const loan = loansData.find(l => l.id === loanId);
             if (!loan) return;
@@ -967,6 +1113,7 @@ html
             const inst = loan.schedule[idx];
             inst.paidAmount += amount;
             inst.paidDate = date;
+            inst.txRef = txRef;
 
             if (inst.paidAmount >= inst.amount) {
                 inst.status = 'Paid';
@@ -975,15 +1122,16 @@ html
             }
 
             saveStorage();
-            logAudit(`Recorded payment of ${formatPKR(amount)} for ${loanId} (Installment #${inst.num})`);
+            logAudit(`Recorded payment of ${formatPKR(amount)} for ${loanId} (Inst #${inst.num})`);
             closeModal('payment-modal');
             renderAdminDashboard();
+
             if (currentCustomerLoan && currentCustomerLoan.id === loanId) {
                 renderCustomerDashboard();
             }
         }
 
-        // --- RECEIPT MODAL ---
+        // --- RECEIPT DISPLAY ---
         function showReceipt(loanId, instNum) {
             const loan = loansData.find(l => l.id === loanId);
             if (!loan) return;
@@ -996,12 +1144,13 @@ html
             document.getElementById('rec-name').textContent = loan.customerName;
             document.getElementById('rec-loan-id').textContent = loan.id;
             document.getElementById('rec-num').textContent = inst.num;
+            document.getElementById('rec-txref').textContent = inst.txRef || 'N/A';
             document.getElementById('rec-amount').textContent = formatPKR(inst.paidAmount);
 
             openModal('receipt-modal');
         }
 
-        // --- CHARTS ---
+        // --- CHART ANALYTICS ---
         function renderAdminCharts() {
             let totalCollected = 0;
             let totalOutstanding = 0;
@@ -1013,16 +1162,16 @@ html
                 });
             });
 
-            // Portfolio Collection Chart
+            // Portfolio Collection Doughnut Chart
             const ctx1 = document.getElementById('chart-portfolio').getContext('2d');
             if (chartPortfolioInstance) chartPortfolioInstance.destroy();
             chartPortfolioInstance = new Chart(ctx1, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Collected Amount', 'Outstanding Balance'],
+                    labels: ['Collected', 'Outstanding'],
                     datasets: [{
                         data: [totalCollected, totalOutstanding],
-                        backgroundColor: ['#059669', '#f59e0b'],
+                        backgroundColor: ['#10b981', '#f59e0b'],
                         borderWidth: 0
                     }]
                 },
@@ -1033,7 +1182,7 @@ html
                 }
             });
 
-            // Loan Types Chart
+            // Loan Frequency Pie Chart
             const ctx2 = document.getElementById('chart-loantypes').getContext('2d');
             let monthlyCount = loansData.filter(l => l.frequency === 'monthly').length;
             let weeklyCount = loansData.filter(l => l.frequency === 'weekly').length;
@@ -1080,9 +1229,9 @@ html
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('href', url);
-            a.setAttribute('download', `loan_portfolio_${new Date().toISOString().split('T')[0]}.csv`);
+            a.setAttribute('download', `pakloan_portfolio_${new Date().toISOString().split('T')[0]}.csv`);
             a.click();
-            logAudit("Exported portfolio dataset to CSV.");
+            logAudit("Exported portfolio records to CSV.");
         }
     </script>
 </body>
