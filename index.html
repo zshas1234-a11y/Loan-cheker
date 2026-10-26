@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PakLoan Check Portal & Management System</title>
+    <title>PakLoan Diary & Loan Manager Pro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js CDN -->
@@ -20,7 +21,6 @@
             body { background: #fff !important; color: #000 !important; }
         }
         .print-only { display: none; }
-        /* Custom scrollbar styling */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -33,174 +33,191 @@
     <header class="bg-slate-900 text-white shadow-lg sticky top-0 z-40 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Brand Logo & Title -->
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('customer')">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchMainTab('user-portal')">
                 <div class="bg-emerald-500 text-slate-950 p-2 rounded-xl font-black text-xl shadow-md shadow-emerald-500/20">
-                    <i class="fa-solid fa-building-columns"></i>
+                    <i class="fa-solid fa-book-bookmark"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight tracking-tight text-white">PakLoan <span class="text-emerald-400 font-normal">Portal</span></h1>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Verification & Management System</p>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight text-white">PakLoan <span class="text-emerald-400 font-normal">Diary Pro</span></h1>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Udhaar & Qist Manager (PKR)</p>
                 </div>
             </div>
             
-            <!-- View Switcher Controls -->
+            <!-- Navigation Switcher -->
             <div class="flex items-center space-x-2">
-                <button id="nav-customer-btn" onclick="switchView('customer')" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-md shadow-emerald-600/30 transition flex items-center space-x-1.5">
-                    <i class="fa-solid fa-user-check text-sm"></i>
-                    <span>Customer Portal</span>
+                <button id="nav-user-btn" onclick="switchMainTab('user-portal')" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-md transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-user-gear text-sm"></i>
+                    <span>User Diary Mode</span>
                 </button>
-                <button id="nav-admin-btn" onclick="switchView('admin')" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center space-x-1.5">
-                    <i class="fa-solid fa-shield-halved text-sm"></i>
-                    <span>Admin Panel</span>
+                <button id="nav-admin-btn" onclick="switchMainTab('admin-panel')" class="px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-user-shield text-sm"></i>
+                    <span>Super Admin Control</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- MAIN APP CONTAINER -->
+    <!-- MAIN CONTAINER -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <!-- ================================================================= -->
-        <!-- CUSTOMER VIEW SECTION                                             -->
+        <!-- USER DIARY PORTAL                                                 -->
         <!-- ================================================================= -->
-        <section id="customer-view" class="space-y-6">
-            
-            <!-- Customer Login / Verification Card -->
-            <div id="customer-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden mt-6 transition-all">
-                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 p-8 text-white text-center relative overflow-hidden">
+        <section id="user-portal-section" class="space-y-6">
+
+            <!-- AUTHENTICATION CARD (LOGIN & REGISTER) -->
+            <div id="user-auth-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden my-6">
+                <!-- Auth Sub-Tab Switcher -->
+                <div class="bg-slate-900 p-6 text-white text-center relative overflow-hidden">
                     <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
-                    <div class="inline-flex p-4 bg-emerald-500/20 text-emerald-400 rounded-2xl mb-4 border border-emerald-500/30">
-                        <i class="fa-solid fa-shield-cat text-3xl"></i>
+                    <div class="inline-flex p-3 bg-emerald-500/20 text-emerald-400 rounded-2xl mb-3 border border-emerald-500/30">
+                        <i class="fa-solid fa-address-book text-2xl"></i>
                     </div>
-                    <h2 class="text-2xl font-extrabold tracking-tight">Check Loan Status</h2>
-                    <p class="text-slate-300 text-xs mt-1.5 max-w-xs mx-auto">Enter your Loan ID and 4-Digit PIN to access your real-time repayment schedule.</p>
+                    <h2 class="text-xl font-extrabold">Personal Udhaar & Loan Diary</h2>
+                    <p class="text-slate-400 text-xs mt-1">Manage your loans, receivables & qist records safely</p>
+                    
+                    <div class="flex bg-slate-800/80 p-1 rounded-xl mt-5 text-xs font-bold border border-slate-700">
+                        <button id="auth-tab-login-btn" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg bg-emerald-600 text-white transition">Login to Diary</button>
+                        <button id="auth-tab-register-btn" onclick="switchAuthTab('register')" class="flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition">New Account</button>
+                    </div>
                 </div>
 
-                <form id="customer-lookup-form" onsubmit="handleCustomerLookup(event)" class="p-6 sm:p-8 space-y-5">
+                <!-- LOGIN FORM -->
+                <form id="user-login-form" onsubmit="handleUserLogin(event)" class="p-6 space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Loan Account ID</label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Mobile / Username</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                                <i class="fa-solid fa-hashtag text-sm"></i>
+                                <i class="fa-solid fa-phone text-xs"></i>
                             </span>
-                            <input type="text" id="cust-loan-id" required placeholder="e.g. L-1001" 
-                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 font-mono font-bold uppercase transition">
+                            <input type="text" id="login-phone" required placeholder="03001234567" 
+                                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 text-xs font-semibold text-slate-900">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">4-Digit Security PIN</label>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">4-Digit Security PIN</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                                <i class="fa-solid fa-key text-sm"></i>
+                                <i class="fa-solid fa-lock text-xs"></i>
                             </span>
-                            <input type="password" id="cust-pin" maxlength="4" pattern="\d{4}" required placeholder="••••" 
-                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 font-mono tracking-[0.5em] text-center text-lg transition">
-                        </div>
-                        <div class="flex justify-between items-center text-[11px] text-slate-400 mt-2">
-                            <span>PIN assigned by loan officer</span>
-                            <span class="text-emerald-600 font-medium">Demo: L-1001 / 1234</span>
+                            <input type="password" id="login-pin" maxlength="4" pattern="\d{4}" required placeholder="••••" 
+                                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 text-xs font-mono tracking-[0.4em] text-center font-bold">
                         </div>
                     </div>
 
-                    <div id="cust-login-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-xs font-medium text-center"></div>
+                    <div id="login-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-xs font-medium text-center"></div>
 
-                    <button type="submit" id="cust-submit-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-emerald-600/30 hover:shadow-xl transition flex items-center justify-center space-x-2">
-                        <span>Access Loan Dashboard</span>
-                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center space-x-2 text-xs">
+                        <span>Open My Loan Diary</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 text-[11px] text-slate-500 text-center">
+                        Demo Account: <strong class="text-slate-800">03001234567</strong> | PIN: <strong class="text-slate-800">1234</strong>
+                    </div>
+                </form>
+
+                <!-- REGISTER FORM -->
+                <form id="user-register-form" onsubmit="handleUserRegister(event)" class="p-6 space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name</label>
+                        <input type="text" id="reg-name" required placeholder="e.g. Imran Khan" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Mobile / Username</label>
+                        <input type="text" id="reg-phone" required placeholder="03001234567" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Create 4-Digit Security PIN</label>
+                        <input type="password" id="reg-pin" maxlength="4" pattern="\d{4}" required placeholder="1234" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-mono tracking-[0.4em] text-center font-bold">
+                    </div>
+
+                    <div id="reg-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-xs font-medium text-center"></div>
+
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow transition text-xs flex items-center justify-center space-x-2">
+                        <span>Register & Create Diary</span>
+                        <i class="fa-solid fa-user-plus"></i>
                     </button>
                 </form>
             </div>
 
-            <!-- Customer Dashboard Screen (Initially Hidden) -->
-            <div id="customer-dashboard" class="hidden space-y-6">
-                <!-- Header / Identity Card -->
+            <!-- LOGGED-IN USER DIARY DASHBOARD -->
+            <div id="user-dashboard" class="hidden space-y-6">
+                <!-- User Header Bar -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
                         <div class="flex items-center space-x-3">
-                            <h2 id="cust-dash-name" class="text-2xl font-extrabold text-slate-900">--</h2>
-                            <span id="cust-dash-badge" class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">Active</span>
+                            <h2 id="udash-user-name" class="text-2xl font-extrabold text-slate-900">--</h2>
+                            <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wider">Active Diary Pro</span>
                         </div>
-                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mt-1.5">
-                            <span>Loan Ref: <strong id="cust-dash-id" class="font-mono text-slate-800">--</strong></span>
-                            <span>•</span>
-                            <span>Phone: <strong id="cust-dash-phone" class="text-slate-800">--</strong></span>
-                            <span>•</span>
-                            <span>Approval Date: <strong id="cust-dash-approval" class="text-slate-800">--</strong></span>
-                        </div>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Mobile Account: <strong id="udash-user-phone" class="text-slate-800">--</strong> | PIN: <strong id="udash-user-pin" class="text-slate-800">****</strong>
+                        </p>
                     </div>
-                    <div class="flex items-center space-x-3 w-full md:w-auto justify-end no-print">
-                        <button onclick="window.print()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2">
-                            <i class="fa-solid fa-print"></i>
-                            <span>Print Statement</span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="openModal('add-diary-entry-modal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span>Add Loan / Udhaar Record</span>
                         </button>
-                        <button onclick="logoutCustomer()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-2">
+                        <button onclick="logoutUser()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
                             <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>Exit Portal</span>
+                            <span>Exit Diary</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Financial Summary Cards -->
+                <!-- Personal Metrics Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Original Principal</div>
-                        <div id="cust-stat-principal" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Receivables (Mujhe Lene Hain)</div>
+                        <div id="udash-stat-receivable" class="text-2xl font-black text-emerald-600 mt-1">Rs. 0</div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Payable</div>
-                        <div id="cust-stat-payable" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Payables (Mujhe Dene Hain)</div>
+                        <div id="udash-stat-payable" class="text-2xl font-black text-rose-600 mt-1">Rs. 0</div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                        <div class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Total Amount Paid</div>
-                        <div id="cust-stat-paid" class="text-2xl font-black text-emerald-600 mt-1">Rs. 0</div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Recovered / Paid</div>
+                        <div id="udash-stat-recovered" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                        <div class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Remaining Balance</div>
-                        <div id="cust-stat-balance" class="text-2xl font-black text-amber-600 mt-1">Rs. 0</div>
+                        <div class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Net Outstanding Balance</div>
+                        <div id="udash-stat-balance" class="text-2xl font-black text-amber-600 mt-1">Rs. 0</div>
                     </div>
                 </div>
 
-                <!-- Repayment Progress Card -->
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 space-y-3">
-                    <div class="flex justify-between items-center text-xs font-bold">
-                        <span class="text-slate-700 uppercase tracking-wider">Overall Repayment Progress</span>
-                        <span id="cust-progress-percent" class="text-emerald-600 text-sm font-black">0%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden p-0.5 border border-slate-200">
-                        <div id="cust-progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                    </div>
-                    <div class="flex justify-between text-[11px] text-slate-400 pt-1">
-                        <span>Paid Installments: <strong id="cust-paid-terms" class="text-slate-700">0</strong></span>
-                        <span>Pending Installments: <strong id="cust-pending-terms" class="text-slate-700">0</strong></span>
-                        <span>Total Terms: <strong id="cust-total-terms" class="text-slate-700">0</strong></span>
-                    </div>
-                </div>
-
-                <!-- Schedule & Payment History Table -->
+                <!-- Diary Entries List -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <div class="p-4 sm:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-                            <i class="fa-solid fa-calendar-check text-emerald-600"></i>
-                            <span>Repayment Schedule & Payment History</span>
+                            <i class="fa-solid fa-list-ul text-emerald-600"></i>
+                            <span>My Personal Udhaar & Loan Entries</span>
                         </h3>
+                        <div class="w-full sm:w-auto flex items-center space-x-2">
+                            <input type="text" id="udash-search" oninput="renderUserDiaryEntries()" placeholder="Search Name, Phone, Note..." 
+                                class="w-full sm:w-64 px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500">
+                        </div>
                     </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="bg-slate-100/70 text-slate-500 font-bold uppercase tracking-wider">
-                                    <th class="py-3 px-4">Inst #</th>
+                                    <th class="py-3 px-4">Type</th>
+                                    <th class="py-3 px-4">Contact Name</th>
+                                    <th class="py-3 px-4">Total Amount</th>
+                                    <th class="py-3 px-4">Recovered/Paid</th>
+                                    <th class="py-3 px-4">Balance</th>
                                     <th class="py-3 px-4">Due Date</th>
-                                    <th class="py-3 px-4">Installment</th>
-                                    <th class="py-3 px-4">Amount Paid</th>
-                                    <th class="py-3 px-4">Paid Date</th>
                                     <th class="py-3 px-4">Status</th>
-                                    <th class="py-3 px-4">Tx Ref</th>
-                                    <th class="py-3 px-4 text-right no-print">Action</th>
+                                    <th class="py-3 px-4 text-right">Actions & WhatsApp</th>
                                 </tr>
                             </thead>
-                            <tbody id="cust-schedule-tbody" class="divide-y divide-slate-100">
-                                <!-- Dynamic Installment Rows -->
+                            <tbody id="user-diary-tbody" class="divide-y divide-slate-100">
+                                <!-- Dynamic Entries -->
                             </tbody>
                         </table>
                     </div>
@@ -209,180 +226,137 @@
         </section>
 
         <!-- ================================================================= -->
-        <!-- ADMIN VIEW SECTION                                                -->
+        <!-- SUPER ADMIN CONTROL PANEL                                         -->
         <!-- ================================================================= -->
-        <section id="admin-view" class="hidden space-y-6">
+        <section id="admin-panel-section" class="hidden space-y-6">
 
-            <!-- Admin Authentication Form -->
-            <div id="admin-login-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden mt-6">
+            <!-- ADMIN AUTH FORM -->
+            <div id="admin-auth-card" class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden my-6">
                 <div class="bg-slate-900 p-8 text-white text-center relative overflow-hidden">
-                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-slate-800 rounded-full blur-2xl"></div>
-                    <div class="inline-flex p-4 bg-slate-800 text-emerald-400 rounded-2xl mb-4 border border-slate-700">
-                        <i class="fa-solid fa-lock-open text-3xl"></i>
+                    <div class="inline-flex p-4 bg-slate-800 text-emerald-400 rounded-2xl mb-3 border border-slate-700">
+                        <i class="fa-solid fa-user-shield text-3xl"></i>
                     </div>
-                    <h2 class="text-2xl font-extrabold tracking-tight">Admin Portal</h2>
-                    <p class="text-slate-400 text-xs mt-1.5">Authorized loan officers only</p>
+                    <h2 class="text-2xl font-extrabold">Super Admin Control</h2>
+                    <p class="text-slate-400 text-xs mt-1">Full visibility over all users & personal loan diaries</p>
                 </div>
 
                 <form id="admin-login-form" onsubmit="handleAdminLogin(event)" class="p-6 sm:p-8 space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                                <i class="fa-solid fa-user text-sm"></i>
-                            </span>
-                            <input type="text" id="admin-username" required placeholder="admin" 
-                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 font-semibold transition">
-                        </div>
+                        <input type="text" id="admin-username" required placeholder="admin" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold">
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
-                                <i class="fa-solid fa-key text-sm"></i>
-                            </span>
-                            <input type="password" id="admin-pass" required placeholder="••••••••" 
-                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-900 transition">
-                        </div>
-                        <div class="flex justify-between items-center text-[11px] text-slate-400 mt-2">
-                            <span>Default: admin / admin10</span>
-                        </div>
+                        <input type="password" id="admin-pass" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs">
+                        <p class="text-[11px] text-slate-400 mt-1">Default Credentials: <strong class="text-slate-700">admin / admin10</strong></p>
                     </div>
 
                     <div id="admin-login-error" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-600 rounded-xl text-xs font-medium text-center"></div>
 
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition flex items-center justify-center space-x-2">
-                        <span>Authenticate & Access</span>
-                        <i class="fa-solid fa-right-to-bracket text-sm"></i>
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow text-xs flex items-center justify-center space-x-2">
+                        <span>Authenticate Super Admin</span>
+                        <i class="fa-solid fa-lock-open"></i>
                     </button>
                 </form>
             </div>
 
-            <!-- Admin Dashboard Screen (Initially Hidden) -->
+            <!-- ADMIN DASHBOARD PANEL -->
             <div id="admin-dashboard" class="hidden space-y-6">
-                <!-- Admin Control Header -->
+                <!-- Control Header -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                     <div>
                         <div class="flex items-center space-x-2">
-                            <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase tracking-wider">Live System</span>
-                            <h2 class="text-2xl font-black text-slate-900">Portfolio Overview</h2>
+                            <span class="px-2.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase tracking-wider">Super Control</span>
+                            <h2 class="text-2xl font-black text-slate-900">System Inspector Panel</h2>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">Manage customers, generate schedules, and log collections in Pakistani Rupees (PKR).</p>
+                        <p class="text-xs text-slate-500 mt-1">Complete inspection of all registered users and their personal loan diaries in PKR.</p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-2.5">
-                        <button onclick="openModal('add-loan-modal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition flex items-center space-x-2">
-                            <i class="fa-solid fa-circle-plus"></i>
-                            <span>New Loan Account</span>
-                        </button>
-                        <button onclick="exportToCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="exportAllSystemCSV()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
                             <i class="fa-solid fa-file-csv text-emerald-600"></i>
-                            <span>Export CSV</span>
+                            <span>Export System CSV</span>
                         </button>
-                        <button onclick="openModal('admin-settings-modal')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
-                            <i class="fa-solid fa-gear"></i>
-                            <span>Settings</span>
-                        </button>
-                        <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1">
+                        <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
                             <i class="fa-solid fa-power-off"></i>
+                            <span>Exit Admin</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Admin Executive Metrics -->
+                <!-- Admin Global Stats -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Registered Accounts</div>
-                        <div id="admin-stat-customers" class="text-2xl font-black text-slate-900 mt-1">0</div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Registered Users</div>
+                        <div id="astat-users-count" class="text-2xl font-black text-slate-900 mt-1">0</div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Portfolio</div>
-                        <div id="admin-stat-portfolio" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Active Diaries</div>
+                        <div id="astat-entries-count" class="text-2xl font-black text-slate-900 mt-1">0</div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                        <div class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">Total Collected</div>
-                        <div id="admin-stat-collected" class="text-2xl font-black text-emerald-600 mt-1">Rs. 0</div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Global Loan Volume</div>
+                        <div id="astat-total-volume" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                        <div class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">Total Outstanding</div>
-                        <div id="admin-stat-outstanding" class="text-2xl font-black text-amber-600 mt-1">Rs. 0</div>
+                        <div class="text-[11px] font-bold text-emerald-600 uppercase tracking-wider">System Collected</div>
+                        <div id="astat-total-collected" class="text-2xl font-black text-emerald-600 mt-1">Rs. 0</div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                        <div class="text-[11px] font-bold text-rose-600 uppercase tracking-wider">Overdue Installments</div>
-                        <div id="admin-stat-overdue-count" class="text-2xl font-black text-rose-600 mt-1">0</div>
+                        <div class="text-[11px] font-bold text-amber-600 uppercase tracking-wider">System Balance</div>
+                        <div id="astat-total-balance" class="text-2xl font-black text-amber-600 mt-1">Rs. 0</div>
                     </div>
                 </div>
 
-                <!-- Chart Visualizations -->
+                <!-- Charts Breakdown -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
                         <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 flex items-center justify-between">
-                            <span>Portfolio Recovery Progress</span>
+                            <span>System Recovery Chart</span>
                             <i class="fa-solid fa-chart-pie text-emerald-600"></i>
                         </h3>
                         <div class="h-56 relative">
-                            <canvas id="chart-portfolio"></canvas>
+                            <canvas id="admin-chart-recovery"></canvas>
                         </div>
                     </div>
                     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
                         <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 flex items-center justify-between">
-                            <span>Loan Frequency Breakdown</span>
+                            <span>Loan Type Breakdown</span>
                             <i class="fa-solid fa-chart-bar text-teal-600"></i>
                         </h3>
                         <div class="h-56 relative">
-                            <canvas id="chart-loantypes"></canvas>
+                            <canvas id="admin-chart-types"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- Admin Main Loans Table -->
+                <!-- Registered Users Table (Super Admin Inspector) -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
                     <div class="p-4 sm:p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
-                            <i class="fa-solid fa-list-check text-emerald-600"></i>
-                            <span>All Loan Accounts</span>
+                            <i class="fa-solid fa-users text-emerald-600"></i>
+                            <span>All Registered Users & Credentials</span>
                         </h3>
-                        <div class="w-full sm:w-auto flex items-center space-x-2">
-                            <div class="relative w-full sm:w-64">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                                </span>
-                                <input type="text" id="admin-search" oninput="renderAdminLoansTable()" placeholder="Search Name, ID, PIN..." 
-                                    class="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500">
-                            </div>
-                        </div>
+                        <input type="text" id="admin-search-users" oninput="renderAdminUsersTable()" placeholder="Search user name or mobile..." 
+                            class="w-full sm:w-64 px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-500">
                     </div>
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="bg-slate-100/70 text-slate-500 font-bold uppercase tracking-wider">
-                                    <th class="py-3 px-4">Loan ID</th>
-                                    <th class="py-3 px-4">Borrower Details</th>
+                                    <th class="py-3 px-4">Full Name</th>
+                                    <th class="py-3 px-4">Mobile / Username</th>
                                     <th class="py-3 px-4">4-Digit PIN</th>
-                                    <th class="py-3 px-4">Principal</th>
-                                    <th class="py-3 px-4">Total Due</th>
-                                    <th class="py-3 px-4">Paid</th>
-                                    <th class="py-3 px-4">Progress</th>
-                                    <th class="py-3 px-4">Status</th>
-                                    <th class="py-3 px-4 text-right">Actions</th>
+                                    <th class="py-3 px-4">Total Entries</th>
+                                    <th class="py-3 px-4">Diary Total (PKR)</th>
+                                    <th class="py-3 px-4 text-right">Inspect & Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="admin-loans-tbody" class="divide-y divide-slate-100">
-                                <!-- Dynamic Rows -->
+                            <tbody id="admin-users-tbody" class="divide-y divide-slate-100">
+                                <!-- Dynamic Users -->
                             </tbody>
                         </table>
-                    </div>
-                </div>
-
-                <!-- System Audit Trail -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 space-y-3">
-                    <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center space-x-2">
-                        <i class="fa-solid fa-clock-rotate-left text-slate-400"></i>
-                        <span>System Audit Logs</span>
-                    </h3>
-                    <div id="audit-log-container" class="max-h-40 overflow-y-auto space-y-1.5 text-[11px] font-mono text-slate-600 bg-slate-900 text-emerald-400 p-4 rounded-xl">
-                        <!-- Dynamic Logs -->
                     </div>
                 </div>
             </div>
@@ -392,123 +366,110 @@
 
     <!-- FOOTER -->
     <footer class="bg-slate-900 text-slate-400 py-6 text-center text-xs border-t border-slate-800 no-print mt-auto">
-        <p>&copy; 2026 PakLoan Check Portal & Loan Management System. PKR Currency Mode.</p>
+        <p>&copy; 2026 PakLoan Diary & Udhaar Manager Pro. Pakistani Rupee Context (PKR).</p>
     </footer>
 
     <!-- ================================================================= -->
     <!-- MODALS SECTION                                                    -->
     <!-- ================================================================= -->
 
-    <!-- Add/Edit Loan Account Modal -->
-    <div id="add-loan-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <!-- Add Loan/Udhaar Entry Modal (User) -->
+    <div id="add-diary-entry-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <h3 id="loan-modal-title" class="text-base font-bold text-slate-900">Create Loan Account</h3>
-                <button onclick="closeModal('add-loan-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+                <h3 class="text-base font-bold text-slate-900">Add Loan / Udhaar Entry</h3>
+                <button onclick="closeModal('add-diary-entry-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
             </div>
-            
-            <form id="loan-form" onsubmit="handleSaveLoan(event)" class="p-6 space-y-4">
-                <input type="hidden" id="form-loan-mode" value="create">
-                
+
+            <form id="add-entry-form" onsubmit="handleSaveDiaryEntry(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Entry Category</label>
+                    <select id="entry-type" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold bg-white">
+                        <option value="given">Mujhe Lene Hain (Given to Someone)</option>
+                        <option value="taken">Mujhe Dene Hain (Taken from Someone)</option>
+                    </select>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Loan Account ID</label>
-                        <input type="text" id="form-loan-id" required placeholder="L-1003" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-mono font-bold uppercase">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Person Name</label>
+                        <input type="text" id="entry-contact-name" required placeholder="e.g. Tariq Mehmood" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Borrower Full Name</label>
-                        <input type="text" id="form-customer-name" required placeholder="Zubair Ahmed" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Person Mobile (WhatsApp)</label>
+                        <input type="text" id="entry-contact-phone" required placeholder="03001234567" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Phone Number</label>
-                        <input type="text" id="form-phone" required placeholder="0300-1234567" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Total Loan Amount (PKR)</label>
+                        <input type="number" id="entry-total-amount" required min="100" step="50" placeholder="50000" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">4-Digit Security PIN</label>
-                        <div class="flex space-x-2">
-                            <input type="text" id="form-pin" maxlength="4" pattern="\d{4}" required placeholder="1234" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-mono tracking-widest text-center font-bold">
-                            <button type="button" onclick="generateRandomPin()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl whitespace-nowrap">Auto</button>
-                        </div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Due Date</label>
+                        <input type="date" id="entry-due-date" required class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Principal (PKR)</label>
-                        <input type="number" id="form-principal" required min="1000" step="1000" placeholder="100000" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Markup / Interest (%)</label>
-                        <input type="number" id="form-rate" required min="0" step="0.5" placeholder="10" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Total Terms / Insts</label>
-                        <input type="number" id="form-terms" required min="1" max="60" placeholder="6" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Repayment Frequency</label>
-                        <select id="form-frequency" class="w-full px-3.5 py-2.5 border rounded-xl text-xs bg-white font-semibold">
-                            <option value="monthly">Monthly</option>
-                            <option value="weekly">Weekly</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Start / Approval Date</label>
-                        <input type="date" id="form-start-date" required class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
-                    </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Additional Notes</label>
+                    <input type="text" id="entry-notes" placeholder="e.g. Shop renovation loan, monthly qist" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
                 </div>
 
                 <div class="pt-4 border-t flex justify-end space-x-3">
-                    <button type="button" onclick="closeModal('add-loan-modal')" class="px-4 py-2.5 border rounded-xl text-xs font-bold hover:bg-slate-50">Cancel</button>
-                    <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20">Save & Generate Schedule</button>
+                    <button type="button" onclick="closeModal('add-diary-entry-modal')" class="px-4 py-2.5 border rounded-xl text-xs font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20">Save Entry</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Record Payment Modal -->
-    <div id="payment-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <!-- Record Payment Modal (User) -->
+    <div id="record-payment-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
             <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <h3 class="text-base font-bold text-slate-900">Record Installment Payment</h3>
-                <button onclick="closeModal('payment-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+                <h3 class="text-base font-bold text-slate-900">Record Received / Paid Amount</h3>
+                <button onclick="closeModal('record-payment-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
             </div>
 
-            <form id="payment-form" onsubmit="handleSavePayment(event)" class="p-6 space-y-4">
-                <input type="hidden" id="pay-loan-id">
-                <input type="hidden" id="pay-installment-index">
+            <form id="record-pay-form" onsubmit="handleSavePayment(event)" class="p-6 space-y-4">
+                <input type="hidden" id="pay-entry-id">
 
                 <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                    <div class="text-[11px] font-bold text-slate-400 uppercase">Target Due Amount</div>
-                    <div id="pay-due-display" class="text-2xl font-black text-slate-900 mt-1">Rs. 0</div>
+                    <div class="text-[11px] font-bold text-slate-400 uppercase">Remaining Pending Balance</div>
+                    <div id="pay-remaining-display" class="text-2xl font-black text-amber-600 mt-1">Rs. 0</div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Payment Amount (PKR)</label>
-                    <input type="number" id="pay-amount" required min="1" step="1" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Payment Date</label>
-                    <input type="date" id="pay-date" required class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-semibold">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Transaction Ref / Cheque #</label>
-                    <input type="text" id="pay-txref" placeholder="TXN-998822" class="w-full px-3.5 py-2.5 border rounded-xl text-xs">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">New Collection / Paid Amount (PKR)</label>
+                    <input type="number" id="pay-amount-input" required min="1" step="1" class="w-full px-3.5 py-2.5 border rounded-xl text-xs font-bold">
                 </div>
 
                 <div class="pt-4 border-t flex justify-end space-x-3">
-                    <button type="button" onclick="closeModal('payment-modal')" class="px-4 py-2.5 border rounded-xl text-xs font-bold">Cancel</button>
-                    <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20">Record Payment</button>
+                    <button type="button" onclick="closeModal('record-payment-modal')" class="px-4 py-2.5 border rounded-xl text-xs font-bold">Cancel</button>
+                    <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md">Add Recovery Record</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Admin User Inspection Modal -->
+    <div id="admin-inspect-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <div>
+                    <h3 id="inspect-user-title" class="text-base font-bold text-slate-900">User Diary Inspection</h3>
+                    <p id="inspect-user-sub" class="text-xs text-slate-500">Full visibility over user records</p>
+                </div>
+                <button onclick="closeModal('admin-inspect-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div id="inspect-entries-container" class="space-y-3">
+                    <!-- Dynamic Inspections -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -517,28 +478,31 @@
         <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
             <div id="receipt-printable" class="p-8 space-y-4 font-mono text-xs">
                 <div class="text-center border-b pb-4">
-                    <h2 class="text-lg font-black tracking-tight text-slate-900">PAKLOAN MANAGEMENT</h2>
-                    <p class="text-slate-500 text-[10px]">Official Payment Collection Receipt</p>
-                    <p class="text-[10px] text-slate-400 mt-1">Receipt Ref: <span id="rec-id">--</span></p>
+                    <h2 class="text-lg font-black tracking-tight text-slate-900">PAKLOAN DIARY PRO</h2>
+                    <p class="text-slate-500 text-[10px]">Official Udhaar / Qist Collection Slip</p>
+                    <p class="text-[10px] text-slate-400 mt-1">Slip #: <span id="rec-slip-id">--</span></p>
                 </div>
 
                 <div class="space-y-2 text-slate-700">
-                    <div class="flex justify-between"><span>Payment Date:</span> <span id="rec-date" class="font-bold">--</span></div>
-                    <div class="flex justify-between"><span>Borrower Name:</span> <span id="rec-name" class="font-bold">--</span></div>
-                    <div class="flex justify-between"><span>Loan Account ID:</span> <span id="rec-loan-id" class="font-bold">--</span></div>
-                    <div class="flex justify-between"><span>Installment #:</span> <span id="rec-num" class="font-bold">--</span></div>
-                    <div class="flex justify-between"><span>Transaction Ref:</span> <span id="rec-txref" class="font-bold">--</span></div>
+                    <div class="flex justify-between"><span>Date:</span> <span id="rec-date" class="font-bold">--</span></div>
+                    <div class="flex justify-between"><span>Diary Account:</span> <span id="rec-owner" class="font-bold">--</span></div>
+                    <div class="flex justify-between"><span>Contact Name:</span> <span id="rec-contact" class="font-bold">--</span></div>
+                    <div class="flex justify-between"><span>Category:</span> <span id="rec-cat" class="font-bold">--</span></div>
                 </div>
 
                 <div class="border-t border-b py-3 my-2 space-y-1">
                     <div class="flex justify-between text-sm font-black text-slate-900">
-                        <span>Paid Amount:</span>
+                        <span>Recovered Amount:</span>
                         <span id="rec-amount">Rs. 0</span>
+                    </div>
+                    <div class="flex justify-between text-[11px] text-slate-500">
+                        <span>Remaining Balance:</span>
+                        <span id="rec-balance">Rs. 0</span>
                     </div>
                 </div>
 
                 <div class="text-center text-[10px] text-slate-400 pt-2">
-                    Thank you for your prompt payment.
+                    Verified Digital Diary Record
                 </div>
             </div>
 
@@ -546,420 +510,249 @@
                 <button onclick="closeModal('receipt-modal')" class="px-4 py-2 border rounded-xl text-xs font-bold">Close</button>
                 <button onclick="window.print()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-md">
                     <i class="fa-solid fa-print"></i>
-                    <span>Print Receipt</span>
+                    <span>Print Slip</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Admin Settings & Security Modal -->
-    <div id="admin-settings-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden">
-            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                <h3 class="text-base font-bold text-slate-900">Admin Security Settings</h3>
-                <button onclick="closeModal('admin-settings-modal')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
-            </div>
-
-            <div class="p-6 space-y-6">
-                <!-- Change Password Form -->
-                <form onsubmit="handleChangeAdminPassword(event)" class="space-y-3 border-b pb-5">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">Change Admin Password</h4>
-                    <div>
-                        <label class="block text-[11px] font-semibold text-slate-500 mb-1">New Admin Password</label>
-                        <input type="password" id="new-admin-pass" required placeholder="Enter new password" class="w-full px-3.5 py-2 border rounded-xl text-xs">
-                    </div>
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs shadow">Update Password</button>
-                </form>
-
-                <!-- Reset Data Button -->
-                <div class="space-y-2">
-                    <h4 class="text-xs font-bold uppercase tracking-wider text-rose-600">Database Operations</h4>
-                    <p class="text-[11px] text-slate-500">Reset system back to default sample records and restore credentials to <strong class="text-slate-700">admin / admin10</strong>.</p>
-                    <button onclick="resetSampleData()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold py-2.5 rounded-xl text-xs transition">
-                        Reset All Sample Data & Credentials
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ================================================================= -->
-    <!-- JAVASCRIPT APP LOGIC                                              -->
+    <!-- JAVASCRIPT LOGIC                                                  -->
     <!-- ================================================================= -->
     <script>
-        // --- CONSTANTS & STATE ---
+        // --- SEED / STORAGE STATE ---
+        let appUsers = [];
+        let appDiaryEntries = [];
+
         const DEFAULT_ADMIN_USER = "admin";
         const DEFAULT_ADMIN_PASS = "admin10";
 
-        let loansData = [];
-        let auditLogs = [];
-        let adminCreds = { user: DEFAULT_ADMIN_USER, pass: DEFAULT_ADMIN_PASS };
-
-        let activeView = 'customer';
-        let currentCustomerLoan = null;
-
-        let chartPortfolioInstance = null;
+        let currentLoggedInUser = null;
+        let chartRecoveryInstance = null;
         let chartTypesInstance = null;
 
-        // --- SAMPLE DEFAULT SEED DATA (PKR) ---
-        const sampleSeedLoans = [
-            {
-                id: "L-1001",
-                customerName: "Muhammad Ali",
-                phone: "0300-1234567",
-                pin: "1234",
-                principal: 150000,
-                rate: 10,
-                terms: 6,
-                frequency: "monthly",
-                startDate: "2026-01-01",
-                schedule: [
-                    { num: 1, dueDate: "2026-02-01", amount: 27500, paidAmount: 27500, paidDate: "2026-01-28", txRef: "TXN-10029", status: "Paid" },
-                    { num: 2, dueDate: "2026-03-01", amount: 27500, paidAmount: 27500, paidDate: "2026-02-28", txRef: "TXN-11048", status: "Paid" },
-                    { num: 3, dueDate: "2026-04-01", amount: 27500, paidAmount: 0, paidDate: null, txRef: "", status: "Pending" },
-                    { num: 4, dueDate: "2026-05-01", amount: 27500, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" },
-                    { num: 5, dueDate: "2026-06-01", amount: 27500, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" },
-                    { num: 6, dueDate: "2026-07-01", amount: 27500, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" }
-                ]
-            },
-            {
-                id: "L-1002",
-                customerName: "Ayesha Khan",
-                phone: "0321-9876543",
-                pin: "4321",
-                principal: 80000,
-                rate: 8,
-                terms: 4,
-                frequency: "monthly",
-                startDate: "2026-02-01",
-                schedule: [
-                    { num: 1, dueDate: "2026-03-01", amount: 21600, paidAmount: 21600, paidDate: "2026-03-01", txRef: "TXN-88412", status: "Paid" },
-                    { num: 2, dueDate: "2026-04-01", amount: 21600, paidAmount: 10000, paidDate: "2026-04-02", txRef: "TXN-90112", status: "Partially Paid" },
-                    { num: 3, dueDate: "2026-05-01", amount: 21600, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" },
-                    { num: 4, dueDate: "2026-06-01", amount: 21600, paidAmount: 0, paidDate: null, txRef: "", status: "Upcoming" }
-                ]
-            }
+        const initialSeedUsers = [
+            { id: "U-101", name: "Imran Khan", phone: "03001234567", pin: "1234" },
+            { id: "U-102", name: "Zubair Ahmed", phone: "03219876543", pin: "4321" }
         ];
 
-        // --- APP INITIALIZATION ---
+        const initialSeedEntries = [
+            { id: "E-1", userId: "U-101", type: "given", contactName: "Tariq Mehmood", contactPhone: "03009988776", totalAmount: 50000, recoveredAmount: 20000, dueDate: "2026-04-01", notes: "Shop equipment loan" },
+            { id: "E-2", userId: "U-101", type: "taken", contactName: "Usman Ghani", contactPhone: "03335544332", totalAmount: 25000, recoveredAmount: 25000, dueDate: "2026-03-01", notes: "Emergency bike cash" },
+            { id: "E-3", userId: "U-102", type: "given", contactName: "Bilal Raza", contactPhone: "03124433221", totalAmount: 100000, recoveredAmount: 40000, dueDate: "2026-05-15", notes: "Monthly Qist diary" }
+        ];
+
+        // --- INIT ---
         window.onload = function() {
             loadStorage();
-            
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('form-start-date').value = today;
-            document.getElementById('pay-date').value = today;
-
-            logAudit("System initialized in PKR currency mode.");
+            document.getElementById('entry-due-date').value = new Date().toISOString().split('T')[0];
         };
 
-        // --- STORAGE & LOGGING ---
         function loadStorage() {
-            const storedData = localStorage.getItem('pakloan_data');
-            if (storedData) {
-                try { loansData = JSON.parse(storedData); } catch(e) { loansData = sampleSeedLoans; }
-            } else {
-                loansData = sampleSeedLoans;
-                saveStorage();
-            }
+            const u = localStorage.getItem('pakloan_pro_users');
+            const e = localStorage.getItem('pakloan_pro_entries');
 
-            const storedCreds = localStorage.getItem('pakloan_admin_creds');
-            if (storedCreds) {
-                try { adminCreds = JSON.parse(storedCreds); } catch(e) { adminCreds = { user: DEFAULT_ADMIN_USER, pass: DEFAULT_ADMIN_PASS }; }
-            } else {
-                adminCreds = { user: DEFAULT_ADMIN_USER, pass: DEFAULT_ADMIN_PASS };
-                localStorage.setItem('pakloan_admin_creds', JSON.stringify(adminCreds));
-            }
+            if (u) { try { appUsers = JSON.parse(u); } catch(err) { appUsers = initialSeedUsers; } }
+            else { appUsers = initialSeedUsers; }
 
-            const storedLogs = localStorage.getItem('pakloan_logs');
-            if (storedLogs) {
-                try { auditLogs = JSON.parse(storedLogs); } catch(e) { auditLogs = []; }
-            }
+            if (e) { try { appDiaryEntries = JSON.parse(e); } catch(err) { appDiaryEntries = initialSeedEntries; } }
+            else { appDiaryEntries = initialSeedEntries; }
+
+            saveStorage();
         }
 
         function saveStorage() {
-            localStorage.setItem('pakloan_data', JSON.stringify(loansData));
-            localStorage.setItem('pakloan_logs', JSON.stringify(auditLogs));
-            localStorage.setItem('pakloan_admin_creds', JSON.stringify(adminCreds));
+            localStorage.setItem('pakloan_pro_users', JSON.stringify(appUsers));
+            localStorage.setItem('pakloan_pro_entries', JSON.stringify(appDiaryEntries));
         }
 
-        function logAudit(msg) {
-            const time = new Date().toLocaleTimeString();
-            auditLogs.unshift(`[${time}] ${msg}`);
-            if (auditLogs.length > 40) auditLogs.pop();
-            saveStorage();
-            renderAuditLogs();
-        }
-
-        function resetSampleData() {
-            if (confirm("Reset system back to default sample records and credentials (admin / admin10)?")) {
-                loansData = sampleSeedLoans;
-                adminCreds = { user: DEFAULT_ADMIN_USER, pass: DEFAULT_ADMIN_PASS };
-                auditLogs = [];
-                saveStorage();
-                alert("Data restored successfully!");
-                location.reload();
-            }
-        }
-
-        // --- FORMATTERS & HELPERS ---
-        function formatPKR(amount) {
-            return 'Rs. ' + Number(amount || 0).toLocaleString('en-PK', { maximumFractionDigits: 0 });
+        // --- HELPERS ---
+        function formatPKR(val) {
+            return 'Rs. ' + Number(val || 0).toLocaleString('en-PK', { maximumFractionDigits: 0 });
         }
 
         function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-        function generateRandomPin() {
-            const pin = Math.floor(1000 + Math.random() * 9000).toString();
-            document.getElementById('form-pin').value = pin;
-        }
-
-        // --- NAVIGATION ---
-        function switchView(view) {
-            activeView = view;
-            const custBtn = document.getElementById('nav-customer-btn');
+        function switchMainTab(tab) {
+            const userSec = document.getElementById('user-portal-section');
+            const adminSec = document.getElementById('admin-panel-section');
+            const userBtn = document.getElementById('nav-user-btn');
             const adminBtn = document.getElementById('nav-admin-btn');
-            const custView = document.getElementById('customer-view');
-            const adminView = document.getElementById('admin-view');
 
-            if (view === 'customer') {
-                custBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-md transition flex items-center space-x-1.5";
+            if (tab === 'user-portal') {
+                userSec.classList.remove('hidden');
+                adminSec.classList.add('hidden');
+                userBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-md transition flex items-center space-x-1.5";
                 adminBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition flex items-center space-x-1.5";
-                custView.classList.remove('hidden');
-                adminView.classList.add('hidden');
             } else {
+                adminSec.classList.remove('hidden');
+                userSec.classList.add('hidden');
                 adminBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white shadow-md transition flex items-center space-x-1.5";
-                custBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition flex items-center space-x-1.5";
-                adminView.classList.remove('hidden');
-                custView.classList.add('hidden');
+                userBtn.className = "px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition flex items-center space-x-1.5";
             }
         }
 
-        // --- CUSTOMER PORTAL LOGIC ---
-        function handleCustomerLookup(e) {
-            e.preventDefault();
-            const loanId = document.getElementById('cust-loan-id').value.trim().toUpperCase();
-            const pin = document.getElementById('cust-pin').value.trim();
-            const errorEl = document.getElementById('cust-login-error');
+        function switchAuthTab(type) {
+            const loginForm = document.getElementById('user-login-form');
+            const regForm = document.getElementById('user-register-form');
+            const loginBtn = document.getElementById('auth-tab-login-btn');
+            const regBtn = document.getElementById('auth-tab-register-btn');
 
-            const loan = loansData.find(l => l.id === loanId && l.pin === pin);
-
-            if (loan) {
-                errorEl.classList.add('hidden');
-                currentCustomerLoan = loan;
-                document.getElementById('customer-login-card').classList.add('hidden');
-                document.getElementById('customer-dashboard').classList.remove('hidden');
-                renderCustomerDashboard();
-                logAudit(`Customer lookup success for Loan ID ${loan.id}`);
+            if (type === 'login') {
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                loginBtn.className = "flex-1 py-2 rounded-lg bg-emerald-600 text-white transition";
+                regBtn.className = "flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition";
             } else {
-                errorEl.textContent = "Invalid Loan Account ID or 4-Digit Security PIN.";
-                errorEl.classList.remove('hidden');
+                regForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                regBtn.className = "flex-1 py-2 rounded-lg bg-emerald-600 text-white transition";
+                loginBtn.className = "flex-1 py-2 rounded-lg text-slate-400 hover:text-white transition";
             }
         }
 
-        function renderCustomerDashboard() {
-            if (!currentCustomerLoan) return;
-            const l = currentCustomerLoan;
-
-            document.getElementById('cust-dash-name').textContent = l.customerName;
-            document.getElementById('cust-dash-id').textContent = l.id;
-            document.getElementById('cust-dash-phone').textContent = l.phone;
-            document.getElementById('cust-dash-approval').textContent = l.startDate;
-
-            let totalPayable = 0;
-            let totalPaid = 0;
-            let paidTerms = 0;
-
-            l.schedule.forEach(item => {
-                totalPayable += item.amount;
-                totalPaid += item.paidAmount;
-                if (item.status === 'Paid') paidTerms++;
-            });
-
-            const remaining = Math.max(0, totalPayable - totalPaid);
-            const progress = totalPayable > 0 ? Math.round((totalPaid / totalPayable) * 100) : 0;
-
-            document.getElementById('cust-stat-principal').textContent = formatPKR(l.principal);
-            document.getElementById('cust-stat-payable').textContent = formatPKR(totalPayable);
-            document.getElementById('cust-stat-paid').textContent = formatPKR(totalPaid);
-            document.getElementById('cust-stat-balance').textContent = formatPKR(remaining);
-
-            document.getElementById('cust-progress-percent').textContent = `${progress}%`;
-            document.getElementById('cust-progress-bar').style.width = `${progress}%`;
-
-            document.getElementById('cust-paid-terms').textContent = paidTerms;
-            document.getElementById('cust-pending-terms').textContent = l.schedule.length - paidTerms;
-            document.getElementById('cust-total-terms').textContent = l.schedule.length;
-
-            // Render Schedule Table
-            const tbody = document.getElementById('cust-schedule-tbody');
-            tbody.innerHTML = '';
-
-            l.schedule.forEach(item => {
-                let badgeClass = "bg-slate-100 text-slate-700";
-                if (item.status === 'Paid') badgeClass = "bg-emerald-100 text-emerald-800";
-                else if (item.status === 'Pending') badgeClass = "bg-amber-100 text-amber-800";
-                else if (item.status === 'Overdue') badgeClass = "bg-rose-100 text-rose-800";
-                else if (item.status === 'Partially Paid') badgeClass = "bg-sky-100 text-sky-800";
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                tr.innerHTML = `
-                    <td class="py-3 px-4 font-bold text-slate-700">${item.num}</td>
-                    <td class="py-3 px-4 font-semibold">${item.dueDate}</td>
-                    <td class="py-3 px-4 font-bold">${formatPKR(item.amount)}</td>
-                    <td class="py-3 px-4 font-bold text-emerald-600">${formatPKR(item.paidAmount)}</td>
-                    <td class="py-3 px-4 text-slate-500">${item.paidDate || '-'}</td>
-                    <td class="py-3 px-4">
-                        <span class="px-2.5 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider ${badgeClass}">${item.status}</span>
-                    </td>
-                    <td class="py-3 px-4 font-mono text-slate-500">${item.txRef || '-'}</td>
-                    <td class="py-3 px-4 text-right no-print">
-                        ${item.paidAmount > 0 ? `
-                            <button onclick="showReceipt('${l.id}', ${item.num})" class="text-xs text-emerald-600 hover:text-emerald-800 font-bold inline-flex items-center space-x-1">
-                                <i class="fa-solid fa-receipt"></i>
-                                <span>Receipt</span>
-                            </button>
-                        ` : '-'}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function logoutCustomer() {
-            currentCustomerLoan = null;
-            document.getElementById('cust-loan-id').value = '';
-            document.getElementById('cust-pin').value = '';
-            document.getElementById('customer-dashboard').classList.add('hidden');
-            document.getElementById('customer-login-card').classList.remove('hidden');
-        }
-
-        // --- ADMIN AUTHENTICATION ---
-        function handleAdminLogin(e) {
+        // --- USER AUTH & REGISTRATION ---
+        function handleUserRegister(e) {
             e.preventDefault();
-            const userInput = document.getElementById('admin-username').value.trim();
-            const passInput = document.getElementById('admin-pass').value.trim();
-            const errorEl = document.getElementById('admin-login-error');
+            const name = document.getElementById('reg-name').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const pin = document.getElementById('reg-pin').value.trim();
+            const err = document.getElementById('reg-error');
 
-            if (userInput === adminCreds.user && passInput === adminCreds.pass) {
-                errorEl.classList.add('hidden');
-                document.getElementById('admin-login-card').classList.add('hidden');
-                document.getElementById('admin-dashboard').classList.remove('hidden');
-                renderAdminDashboard();
-                logAudit("Admin login authenticated successfully.");
-            } else {
-                errorEl.textContent = "Invalid Admin Username or Password.";
-                errorEl.classList.remove('hidden');
-            }
-        }
-
-        function handleChangeAdminPassword(e) {
-            e.preventDefault();
-            const newPass = document.getElementById('new-admin-pass').value.trim();
-            if (newPass.length < 4) {
-                alert("Password must be at least 4 characters long.");
+            if (appUsers.some(u => u.phone === phone)) {
+                err.textContent = "Mobile / Username already registered! Please login.";
+                err.classList.remove('hidden');
                 return;
             }
-            adminCreds.pass = newPass;
+
+            const newUser = {
+                id: `U-${Date.now().toString().slice(-4)}`,
+                name: name,
+                phone: phone,
+                pin: pin
+            };
+
+            appUsers.push(newUser);
             saveStorage();
-            logAudit("Admin password updated.");
-            alert("Admin password updated successfully!");
-            closeModal('admin-settings-modal');
+            err.classList.add('hidden');
+
+            alert("Registration successful! Logging into your new Loan Diary...");
+            currentLoggedInUser = newUser;
+            showUserDashboard();
         }
 
-        function logoutAdmin() {
-            document.getElementById('admin-pass').value = '';
-            document.getElementById('admin-dashboard').classList.add('hidden');
-            document.getElementById('admin-login-card').classList.remove('hidden');
+        function handleUserLogin(e) {
+            e.preventDefault();
+            const phone = document.getElementById('login-phone').value.trim();
+            const pin = document.getElementById('login-pin').value.trim();
+            const err = document.getElementById('login-error');
+
+            const user = appUsers.find(u => u.phone === phone && u.pin === pin);
+
+            if (user) {
+                err.classList.add('hidden');
+                currentLoggedInUser = user;
+                showUserDashboard();
+            } else {
+                err.textContent = "Invalid Mobile/Username or 4-Digit Security PIN.";
+                err.classList.remove('hidden');
+            }
         }
 
-        // --- ADMIN DASHBOARD RENDERERS ---
-        function renderAdminDashboard() {
-            renderAdminMetrics();
-            renderAdminLoansTable();
-            renderAdminCharts();
-            renderAuditLogs();
+        function showUserDashboard() {
+            document.getElementById('user-auth-card').classList.add('hidden');
+            document.getElementById('user-dashboard').classList.remove('hidden');
+
+            document.getElementById('udash-user-name').textContent = currentLoggedInUser.name;
+            document.getElementById('udash-user-phone').textContent = currentLoggedInUser.phone;
+            document.getElementById('udash-user-pin').textContent = currentLoggedInUser.pin;
+
+            renderUserDiaryEntries();
         }
 
-        function renderAdminMetrics() {
-            let totalPortfolio = 0;
-            let totalCollected = 0;
-            let overdueCount = 0;
+        function logoutUser() {
+            currentLoggedInUser = null;
+            document.getElementById('user-dashboard').classList.add('hidden');
+            document.getElementById('user-auth-card').classList.remove('hidden');
+        }
 
-            loansData.forEach(l => {
-                totalPortfolio += l.principal;
-                l.schedule.forEach(item => {
-                    totalCollected += item.paidAmount;
-                    if (item.status === 'Overdue') overdueCount++;
-                });
+        // --- USER DIARY OPERATIONS ---
+        function renderUserDiaryEntries() {
+            if (!currentLoggedInUser) return;
+
+            const query = document.getElementById('udash-search').value.toLowerCase();
+            const userEntries = appDiaryEntries.filter(e => e.userId === currentLoggedInUser.id);
+
+            let totalReceivable = 0;
+            let totalPayable = 0;
+            let totalRecovered = 0;
+
+            userEntries.forEach(e => {
+                const bal = Math.max(0, e.totalAmount - e.recoveredAmount);
+                if (e.type === 'given') {
+                    totalReceivable += bal;
+                } else {
+                    totalPayable += bal;
+                }
+                totalRecovered += e.recoveredAmount;
             });
 
-            const outstanding = Math.max(0, totalPortfolio - totalCollected);
+            document.getElementById('udash-stat-receivable').textContent = formatPKR(totalReceivable);
+            document.getElementById('udash-stat-payable').textContent = formatPKR(totalPayable);
+            document.getElementById('udash-stat-recovered').textContent = formatPKR(totalRecovered);
+            document.getElementById('udash-stat-balance').textContent = formatPKR(totalReceivable - totalPayable);
 
-            document.getElementById('admin-stat-customers').textContent = loansData.length;
-            document.getElementById('admin-stat-portfolio').textContent = formatPKR(totalPortfolio);
-            document.getElementById('admin-stat-collected').textContent = formatPKR(totalCollected);
-            document.getElementById('admin-stat-outstanding').textContent = formatPKR(outstanding);
-            document.getElementById('admin-stat-overdue-count').textContent = overdueCount;
-        }
-
-        function renderAdminLoansTable() {
-            const query = document.getElementById('admin-search').value.toLowerCase();
-            const tbody = document.getElementById('admin-loans-tbody');
-            tbody.innerHTML = '';
-
-            const filtered = loansData.filter(l => 
-                l.id.toLowerCase().includes(query) ||
-                l.customerName.toLowerCase().includes(query) ||
-                l.pin.includes(query) ||
-                l.phone.includes(query)
+            const filtered = userEntries.filter(e => 
+                e.contactName.toLowerCase().includes(query) ||
+                e.contactPhone.includes(query) ||
+                (e.notes && e.notes.toLowerCase().includes(query))
             );
 
-            filtered.forEach(l => {
-                let totalDue = 0;
-                let totalPaid = 0;
+            const tbody = document.getElementById('user-diary-tbody');
+            tbody.innerHTML = '';
 
-                l.schedule.forEach(item => {
-                    totalDue += item.amount;
-                    totalPaid += item.paidAmount;
-                });
+            filtered.forEach(e => {
+                const balance = Math.max(0, e.totalAmount - e.recoveredAmount);
+                const isGiven = e.type === 'given';
+                const typeTag = isGiven ? 
+                    `<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase">Mujhe Lene Hain</span>` :
+                    `<span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold text-[10px] uppercase">Mujhe Dene Hain</span>`;
 
-                const progress = totalDue > 0 ? Math.round((totalPaid / totalDue) * 100) : 0;
-                const statusBadge = progress >= 100 ? 
-                    '<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase">Completed</span>' :
-                    '<span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold text-[10px] uppercase">Active</span>';
+                const statusTag = balance === 0 ? 
+                    `<span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px] uppercase">Cleared</span>` :
+                    `<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold text-[10px] uppercase">Pending</span>`;
+
+                // WhatsApp reminder text
+                const waText = encodeURIComponent(`Assalam-o-Alaikum ${e.contactName}, Aap ka Loan/Qist Amount ${formatPKR(balance)} Due Date ${e.dueDate} tak pending hai. Kindly pay at your earliest.`);
+                const waUrl = `https://wa.me/${e.contactPhone.replace(/[^0-9]/g, '')}?text=${waText}`;
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="py-3 px-4 font-mono font-bold text-slate-900">${l.id}</td>
+                    <td class="py-3 px-4">${typeTag}</td>
                     <td class="py-3 px-4">
-                        <div class="font-bold text-slate-900">${l.customerName}</div>
-                        <div class="text-[11px] text-slate-400">${l.phone}</div>
+                        <div class="font-bold text-slate-900">${e.contactName}</div>
+                        <div class="text-[11px] text-slate-400">${e.contactPhone}</div>
                     </td>
-                    <td class="py-3 px-4 font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-center border">${l.pin}</td>
-                    <td class="py-3 px-4 font-bold text-slate-800">${formatPKR(l.principal)}</td>
-                    <td class="py-3 px-4 text-slate-600 font-semibold">${formatPKR(totalDue)}</td>
-                    <td class="py-3 px-4 font-bold text-emerald-600">${formatPKR(totalPaid)}</td>
-                    <td class="py-3 px-4">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-16 bg-slate-200 rounded-full h-2">
-                                <div class="bg-emerald-600 h-2 rounded-full" style="width: ${progress}%"></div>
-                            </div>
-                            <span class="text-[11px] font-bold text-slate-600">${progress}%</span>
-                        </div>
-                    </td>
-                    <td class="py-3 px-4">${statusBadge}</td>
+                    <td class="py-3 px-4 font-bold">${formatPKR(e.totalAmount)}</td>
+                    <td class="py-3 px-4 font-bold text-emerald-600">${formatPKR(e.recoveredAmount)}</td>
+                    <td class="py-3 px-4 font-bold text-amber-600">${formatPKR(balance)}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-600">${e.dueDate}</td>
+                    <td class="py-3 px-4">${statusTag}</td>
                     <td class="py-3 px-4 text-right">
                         <div class="flex items-center justify-end space-x-1.5">
-                            <button onclick="openPaymentModalForLoan('${l.id}')" title="Record Payment" class="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg transition">
+                            <a href="${waUrl}" target="_blank" title="Send WhatsApp Reminder" class="p-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-lg transition font-bold text-xs flex items-center space-x-1">
+                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                                <span>Remind</span>
+                            </a>
+                            <button onclick="openPaymentModal('${e.id}')" title="Add Recovery" class="p-1.5 bg-sky-50 text-sky-600 hover:bg-sky-100 rounded-lg transition">
                                 <i class="fa-solid fa-cash-register"></i>
                             </button>
-                            <button onclick="editLoan('${l.id}')" title="Edit Loan" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg transition">
-                                <i class="fa-solid fa-pen"></i>
+                            <button onclick="showSlip('${e.id}')" title="Print Slip" class="p-1.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-lg transition">
+                                <i class="fa-solid fa-receipt"></i>
                             </button>
-                            <button onclick="deleteLoan('${l.id}')" title="Delete Account" class="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition">
+                            <button onclick="deleteEntry('${e.id}')" title="Delete Entry" class="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -969,269 +762,280 @@
             });
         }
 
-        // --- AUTOMATED SCHEDULE GENERATOR ---
-        function generateSchedule(principal, annualRate, terms, frequency, startDateStr) {
-            const schedule = [];
-            const totalInterest = (principal * (annualRate / 100));
-            const totalPayable = principal + totalInterest;
-            const installmentAmount = Math.round(totalPayable / terms);
-
-            let currDate = new Date(startDateStr);
-
-            for (let i = 1; i <= terms; i++) {
-                if (frequency === 'monthly') {
-                    currDate.setMonth(currDate.getMonth() + 1);
-                } else {
-                    currDate.setDate(currDate.getDate() + 7);
-                }
-
-                schedule.push({
-                    num: i,
-                    dueDate: currDate.toISOString().split('T')[0],
-                    amount: installmentAmount,
-                    paidAmount: 0,
-                    paidDate: null,
-                    txRef: "",
-                    status: 'Upcoming'
-                });
-            }
-
-            return schedule;
-        }
-
-        // --- LOAN CRUD LOGIC ---
-        function handleSaveLoan(e) {
+        function handleSaveDiaryEntry(e) {
             e.preventDefault();
-            const mode = document.getElementById('form-loan-mode').value;
-            const loanId = document.getElementById('form-loan-id').value.trim().toUpperCase();
-            const name = document.getElementById('form-customer-name').value.trim();
-            const phone = document.getElementById('form-phone').value.trim();
-            const pin = document.getElementById('form-pin').value.trim();
-            const principal = parseFloat(document.getElementById('form-principal').value);
-            const rate = parseFloat(document.getElementById('form-rate').value);
-            const terms = parseInt(document.getElementById('form-terms').value);
-            const frequency = document.getElementById('form-frequency').value;
-            const startDate = document.getElementById('form-start-date').value;
+            if (!currentLoggedInUser) return;
 
-            if (mode === 'create') {
-                if (loansData.some(l => l.id === loanId)) {
-                    alert('Loan Account ID already exists!');
-                    return;
-                }
+            const type = document.getElementById('entry-type').value;
+            const contactName = document.getElementById('entry-contact-name').value.trim();
+            const contactPhone = document.getElementById('entry-contact-phone').value.trim();
+            const totalAmount = parseFloat(document.getElementById('entry-total-amount').value);
+            const dueDate = document.getElementById('entry-due-date').value;
+            const notes = document.getElementById('entry-notes').value.trim();
 
-                const newLoan = {
-                    id: loanId,
-                    customerName: name,
-                    phone: phone,
-                    pin: pin,
-                    principal: principal,
-                    rate: rate,
-                    terms: terms,
-                    frequency: frequency,
-                    startDate: startDate,
-                    schedule: generateSchedule(principal, rate, terms, frequency, startDate)
-                };
+            const newEntry = {
+                id: `E-${Date.now().toString().slice(-5)}`,
+                userId: currentLoggedInUser.id,
+                type: type,
+                contactName: contactName,
+                contactPhone: contactPhone,
+                totalAmount: totalAmount,
+                recoveredAmount: 0,
+                dueDate: dueDate,
+                notes: notes
+            };
 
-                loansData.push(newLoan);
-                logAudit(`Created loan account ${loanId} for ${name} (PIN: ${pin})`);
-            } else {
-                const loan = loansData.find(l => l.id === loanId);
-                if (loan) {
-                    loan.customerName = name;
-                    loan.phone = phone;
-                    loan.pin = pin;
-                    logAudit(`Updated customer details for ${loanId}`);
-                }
-            }
-
+            appDiaryEntries.push(newEntry);
             saveStorage();
-            closeModal('add-loan-modal');
-            renderAdminDashboard();
+            closeModal('add-diary-entry-modal');
+            renderUserDiaryEntries();
         }
 
-        function editLoan(id) {
-            const loan = loansData.find(l => l.id === id);
-            if (!loan) return;
+        function openPaymentModal(entryId) {
+            const entry = appDiaryEntries.find(e => e.id === entryId);
+            if (!entry) return;
 
-            document.getElementById('loan-modal-title').textContent = "Edit Loan Account";
-            document.getElementById('form-loan-mode').value = "edit";
-            document.getElementById('form-loan-id').value = loan.id;
-            document.getElementById('form-loan-id').readOnly = true;
-            document.getElementById('form-customer-name').value = loan.customerName;
-            document.getElementById('form-phone').value = loan.phone;
-            document.getElementById('form-pin').value = loan.pin;
-            document.getElementById('form-principal').value = loan.principal;
-            document.getElementById('form-rate').value = loan.rate;
-            document.getElementById('form-terms').value = loan.terms;
-            document.getElementById('form-frequency').value = loan.frequency;
-            document.getElementById('form-start-date').value = loan.startDate;
-
-            openModal('add-loan-modal');
-        }
-
-        function deleteLoan(id) {
-            if (confirm(`Are you sure you want to delete loan account ${id}?`)) {
-                loansData = loansData.filter(l => l.id !== id);
-                saveStorage();
-                logAudit(`Deleted loan account ${id}`);
-                renderAdminDashboard();
-            }
-        }
-
-        // --- PAYMENT RECORDING LOGIC ---
-        function openPaymentModalForLoan(id) {
-            const loan = loansData.find(l => l.id === id);
-            if (!loan) return;
-
-            const instIndex = loan.schedule.findIndex(s => s.status !== 'Paid');
-            if (instIndex === -1) {
-                alert('All installments for this loan are fully paid!');
+            const balance = Math.max(0, entry.totalAmount - entry.recoveredAmount);
+            if (balance === 0) {
+                alert("This loan entry is already fully cleared!");
                 return;
             }
 
-            const inst = loan.schedule[instIndex];
+            document.getElementById('pay-entry-id').value = entry.id;
+            document.getElementById('pay-remaining-display').textContent = formatPKR(balance);
+            document.getElementById('pay-amount-input').value = balance;
 
-            document.getElementById('pay-loan-id').value = loan.id;
-            document.getElementById('pay-installment-index').value = instIndex;
-            document.getElementById('pay-due-display').textContent = formatPKR(inst.amount - inst.paidAmount);
-            document.getElementById('pay-amount').value = inst.amount - inst.paidAmount;
-
-            openModal('payment-modal');
+            openModal('record-payment-modal');
         }
 
         function handleSavePayment(e) {
             e.preventDefault();
-            const loanId = document.getElementById('pay-loan-id').value;
-            const idx = parseInt(document.getElementById('pay-installment-index').value);
-            const amount = parseFloat(document.getElementById('pay-amount').value);
-            const date = document.getElementById('pay-date').value;
-            const txRef = document.getElementById('pay-txref').value.trim() || `TXN-${Math.floor(10000 + Math.random() * 90000)}`;
+            const entryId = document.getElementById('pay-entry-id').value;
+            const amount = parseFloat(document.getElementById('pay-amount-input').value);
 
-            const loan = loansData.find(l => l.id === loanId);
-            if (!loan) return;
+            const entry = appDiaryEntries.find(e => e.id === entryId);
+            if (!entry) return;
 
-            const inst = loan.schedule[idx];
-            inst.paidAmount += amount;
-            inst.paidDate = date;
-            inst.txRef = txRef;
-
-            if (inst.paidAmount >= inst.amount) {
-                inst.status = 'Paid';
-            } else {
-                inst.status = 'Partially Paid';
-            }
-
+            entry.recoveredAmount += amount;
             saveStorage();
-            logAudit(`Recorded payment of ${formatPKR(amount)} for ${loanId} (Inst #${inst.num})`);
-            closeModal('payment-modal');
-            renderAdminDashboard();
+            closeModal('record-payment-modal');
+            renderUserDiaryEntries();
+        }
 
-            if (currentCustomerLoan && currentCustomerLoan.id === loanId) {
-                renderCustomerDashboard();
+        function deleteEntry(id) {
+            if (confirm("Delete this diary entry?")) {
+                appDiaryEntries = appDiaryEntries.filter(e => e.id !== id);
+                saveStorage();
+                renderUserDiaryEntries();
             }
         }
 
-        // --- RECEIPT DISPLAY ---
-        function showReceipt(loanId, instNum) {
-            const loan = loansData.find(l => l.id === loanId);
-            if (!loan) return;
+        function showSlip(entryId) {
+            const entry = appDiaryEntries.find(e => e.id === entryId);
+            if (!entry) return;
 
-            const inst = loan.schedule.find(s => s.num === instNum);
-            if (!inst) return;
-
-            document.getElementById('rec-id').textContent = `REC-${Math.floor(100000 + Math.random() * 900000)}`;
-            document.getElementById('rec-date').textContent = inst.paidDate || new Date().toISOString().split('T')[0];
-            document.getElementById('rec-name').textContent = loan.customerName;
-            document.getElementById('rec-loan-id').textContent = loan.id;
-            document.getElementById('rec-num').textContent = inst.num;
-            document.getElementById('rec-txref').textContent = inst.txRef || 'N/A';
-            document.getElementById('rec-amount').textContent = formatPKR(inst.paidAmount);
+            document.getElementById('rec-slip-id').textContent = `SLIP-${Math.floor(100000 + Math.random() * 900000)}`;
+            document.getElementById('rec-date').textContent = new Date().toISOString().split('T')[0];
+            document.getElementById('rec-owner').textContent = currentLoggedInUser ? currentLoggedInUser.name : 'System';
+            document.getElementById('rec-contact').textContent = entry.contactName;
+            document.getElementById('rec-cat').textContent = entry.type === 'given' ? 'Mujhe Lene Hain' : 'Mujhe Dene Hain';
+            document.getElementById('rec-amount').textContent = formatPKR(entry.recoveredAmount);
+            document.getElementById('rec-balance').textContent = formatPKR(Math.max(0, entry.totalAmount - entry.recoveredAmount));
 
             openModal('receipt-modal');
         }
 
-        // --- CHART ANALYTICS ---
-        function renderAdminCharts() {
-            let totalCollected = 0;
-            let totalOutstanding = 0;
+        // --- SUPER ADMIN LOGIC ---
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('admin-username').value.trim();
+            const pass = document.getElementById('admin-pass').value.trim();
+            const err = document.getElementById('admin-login-error');
 
-            loansData.forEach(l => {
-                l.schedule.forEach(item => {
-                    totalCollected += item.paidAmount;
-                    totalOutstanding += Math.max(0, item.amount - item.paidAmount);
-                });
+            if (user === DEFAULT_ADMIN_USER && pass === DEFAULT_ADMIN_PASS) {
+                err.classList.add('hidden');
+                document.getElementById('admin-auth-card').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                renderAdminDashboard();
+            } else {
+                err.textContent = "Invalid Super Admin credentials.";
+                err.classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.getElementById('admin-auth-card').classList.remove('hidden');
+        }
+
+        function renderAdminDashboard() {
+            let totalVolume = 0;
+            let totalCollected = 0;
+
+            appDiaryEntries.forEach(e => {
+                totalVolume += e.totalAmount;
+                totalCollected += e.recoveredAmount;
             });
 
-            // Portfolio Collection Doughnut Chart
-            const ctx1 = document.getElementById('chart-portfolio').getContext('2d');
-            if (chartPortfolioInstance) chartPortfolioInstance.destroy();
-            chartPortfolioInstance = new Chart(ctx1, {
+            const totalBalance = Math.max(0, totalVolume - totalCollected);
+
+            document.getElementById('astat-users-count').textContent = appUsers.length;
+            document.getElementById('astat-entries-count').textContent = appDiaryEntries.length;
+            document.getElementById('astat-total-volume').textContent = formatPKR(totalVolume);
+            document.getElementById('astat-total-collected').textContent = formatPKR(totalCollected);
+            document.getElementById('astat-total-balance').textContent = formatPKR(totalBalance);
+
+            renderAdminUsersTable();
+            renderAdminCharts(totalCollected, totalBalance);
+        }
+
+        function renderAdminUsersTable() {
+            const query = document.getElementById('admin-search-users').value.toLowerCase();
+            const tbody = document.getElementById('admin-users-tbody');
+            tbody.innerHTML = '';
+
+            const filtered = appUsers.filter(u => 
+                u.name.toLowerCase().includes(query) ||
+                u.phone.includes(query)
+            );
+
+            filtered.forEach(u => {
+                const userEntries = appDiaryEntries.filter(e => e.userId === u.id);
+                let userTotal = 0;
+                userEntries.forEach(e => userTotal += e.totalAmount);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-bold text-slate-900">${u.name}</td>
+                    <td class="py-3 px-4 text-slate-600">${u.phone}</td>
+                    <td class="py-3 px-4"><span class="font-mono bg-slate-100 border px-2 py-0.5 rounded font-bold">${u.pin}</span></td>
+                    <td class="py-3 px-4 font-semibold">${userEntries.length} entries</td>
+                    <td class="py-3 px-4 font-bold text-emerald-600">${formatPKR(userTotal)}</td>
+                    <td class="py-3 px-4 text-right">
+                        <div class="flex items-center justify-end space-x-1.5">
+                            <button onclick="inspectUserDiary('${u.id}')" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>Inspect Diary</span>
+                            </button>
+                            <button onclick="resetUserPin('${u.id}')" title="Reset PIN" class="p-1.5 bg-amber-50 text-amber-600 hover:bg-amber-100 rounded-lg transition">
+                                <i class="fa-solid fa-key"></i>
+                            </button>
+                            <button onclick="deleteUser('${u.id}')" title="Delete User" class="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg transition">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function inspectUserDiary(userId) {
+            const user = appUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('inspect-user-title').textContent = `${user.name}'s Personal Loan Diary`;
+            document.getElementById('inspect-user-sub').textContent = `Mobile: ${user.phone} | Security PIN: ${user.pin}`;
+
+            const userEntries = appDiaryEntries.filter(e => e.userId === userId);
+            const container = document.getElementById('inspect-entries-container');
+
+            if (userEntries.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-6">No diary records created by this user yet.</p>`;
+            } else {
+                container.innerHTML = userEntries.map(e => `
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${e.type === 'given' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${e.type === 'given' ? 'Mujhe Lene Hain' : 'Mujhe Dene Hain'}</span>
+                            <div class="font-bold text-sm text-slate-900 mt-1">${e.contactName} (${e.contactPhone})</div>
+                            <div class="text-slate-500">Due: ${e.dueDate} | Notes: ${e.notes || 'None'}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-black text-slate-900 text-sm">${formatPKR(e.totalAmount)}</div>
+                            <div class="text-emerald-600 font-bold">Paid: ${formatPKR(e.recoveredAmount)}</div>
+                            <div class="text-amber-600 font-bold">Bal: ${formatPKR(Math.max(0, e.totalAmount - e.recoveredAmount))}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            openModal('admin-inspect-modal');
+        }
+
+        function resetUserPin(userId) {
+            const user = appUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            const newPin = prompt(`Enter new 4-Digit Security PIN for ${user.name}:`, "1234");
+            if (newPin && newPin.length === 4) {
+                user.pin = newPin;
+                saveStorage();
+                renderAdminDashboard();
+                alert(`PIN updated successfully to ${newPin}`);
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm("Delete this user and all associated personal diary entries?")) {
+                appUsers = appUsers.filter(u => u.id !== userId);
+                appDiaryEntries = appDiaryEntries.filter(e => e.userId !== userId);
+                saveStorage();
+                renderAdminDashboard();
+            }
+        }
+
+        function renderAdminCharts(collected, balance) {
+            const ctx1 = document.getElementById('admin-chart-recovery').getContext('2d');
+            if (chartRecoveryInstance) chartRecoveryInstance.destroy();
+            chartRecoveryInstance = new Chart(ctx1, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Collected', 'Outstanding'],
+                    labels: ['System Collected', 'System Pending'],
                     datasets: [{
-                        data: [totalCollected, totalOutstanding],
+                        data: [collected, balance],
                         backgroundColor: ['#10b981', '#f59e0b'],
                         borderWidth: 0
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
 
-            // Loan Frequency Pie Chart
-            const ctx2 = document.getElementById('chart-loantypes').getContext('2d');
-            let monthlyCount = loansData.filter(l => l.frequency === 'monthly').length;
-            let weeklyCount = loansData.filter(l => l.frequency === 'weekly').length;
+            const ctx2 = document.getElementById('admin-chart-types').getContext('2d');
+            let givenCount = appDiaryEntries.filter(e => e.type === 'given').length;
+            let takenCount = appDiaryEntries.filter(e => e.type === 'taken').length;
 
             if (chartTypesInstance) chartTypesInstance.destroy();
             chartTypesInstance = new Chart(ctx2, {
                 type: 'pie',
                 data: {
-                    labels: ['Monthly Terms', 'Weekly Terms'],
+                    labels: ['Mujhe Lene Hain', 'Mujhe Dene Hain'],
                     datasets: [{
-                        data: [monthlyCount, weeklyCount],
-                        backgroundColor: ['#0d9488', '#6366f1'],
+                        data: [givenCount, takenCount],
+                        backgroundColor: ['#0d9488', '#e11d48'],
                         borderWidth: 0
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
         }
 
-        // --- LOGS & EXPORT ---
-        function renderAuditLogs() {
-            const container = document.getElementById('audit-log-container');
-            container.innerHTML = auditLogs.map(log => `<div>${log}</div>`).join('');
-        }
-
-        function exportToCSV() {
-            let csv = 'Loan ID,Customer Name,Phone,PIN,Principal (PKR),Interest Rate %,Frequency,Total Due (PKR),Total Paid (PKR)\n';
+        function exportAllSystemCSV() {
+            let csv = 'Entry ID,User Name,User Phone,Category,Contact Name,Contact Phone,Total Amount (PKR),Recovered (PKR),Due Date,Notes\n';
             
-            loansData.forEach(l => {
-                let totalDue = 0;
-                let totalPaid = 0;
-                l.schedule.forEach(s => {
-                    totalDue += s.amount;
-                    totalPaid += s.paidAmount;
-                });
-                csv += `"${l.id}","${l.customerName}","${l.phone}","${l.pin}",${l.principal},${l.rate},"${l.frequency}",${totalDue},${totalPaid}\n`;
+            appDiaryEntries.forEach(e => {
+                const u = appUsers.find(usr => usr.id === e.userId);
+                const userName = u ? u.name : 'Unknown';
+                const userPhone = u ? u.phone : '';
+                csv += `"${e.id}","${userName}","${userPhone}","${e.type}","${e.contactName}","${e.contactPhone}",${e.totalAmount},${e.recoveredAmount},"${e.dueDate}","${e.notes || ''}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('href', url);
-            a.setAttribute('download', `pakloan_portfolio_${new Date().toISOString().split('T')[0]}.csv`);
+            a.setAttribute('download', `pakloan_system_export_${new Date().toISOString().split('T')[0]}.csv`);
             a.click();
-            logAudit("Exported portfolio records to CSV.");
         }
     </script>
 </body>
