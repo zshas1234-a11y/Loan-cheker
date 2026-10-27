@@ -65,16 +65,15 @@
 
     <main class="max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 flex-grow">
       
-      <!-- TOP LIVE ACTIVITY & AUDIT LOG PANEL -->
+      <!-- LOG PANEL -->
       <div class="admin-card p-5 rounded-2xl border-l-4 border-l-cyan-500">
         <div class="flex justify-between items-center mb-3">
           <h3 class="text-xs font-extrabold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-terminal"></i> Live Admin Activity & Audit Log
+            <i class="fa-solid fa-terminal"></i> Live Activity & Audit Log
           </h3>
-          <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-700">Real-time Tracker</span>
         </div>
-        <div id="activityLogContainer" class="bg-slate-900/90 rounded-xl p-3 h-24 overflow-y-auto space-y-1.5 font-mono text-[11px] text-slate-300 border border-slate-800">
-          <div class="text-slate-500">[System] Initialized cloud session successfully. Waiting for admin actions...</div>
+        <div id="activityLogContainer" class="bg-slate-900/90 rounded-xl p-3 h-20 overflow-y-auto space-y-1 font-mono text-[11px] text-slate-300 border border-slate-800">
+          <div class="text-slate-550">[System] Connected. Ready for actions...</div>
         </div>
       </div>
 
@@ -83,23 +82,23 @@
         <!-- PAYMENT ACCOUNTS -->
         <div class="admin-card p-6 rounded-2xl">
           <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-wallet text-blue-400"></i> Admin Payment Numbers
+            <i class="fa-solid fa-wallet text-blue-400"></i> Payment Numbers
           </h3>
           <form onsubmit="saveAccounts(event)" class="space-y-3 text-xs">
             <div>
-              <label class="block text-slate-400 font-bold mb-1">EasyPaisa Number</label>
+              <label class="block text-slate-400 font-bold mb-1">EasyPaisa</label>
               <input type="text" id="accEasyPaisa" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-emerald-400 font-mono font-bold" required>
             </div>
             <div>
-              <label class="block text-slate-400 font-bold mb-1">JazzCash Number</label>
+              <label class="block text-slate-400 font-bold mb-1">JazzCash</label>
               <input type="text" id="accJazzCash" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-red-400 font-mono font-bold" required>
             </div>
             <div>
-              <label class="block text-slate-400 font-bold mb-1">SadaPay Number</label>
+              <label class="block text-slate-400 font-bold mb-1">SadaPay</label>
               <input type="text" id="accSadaPay" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-teal-300 font-mono font-bold" required>
             </div>
             <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition mt-2">
-              Save Payment Numbers
+              Save Numbers
             </button>
           </form>
         </div>
@@ -107,24 +106,24 @@
         <!-- ADD NEW LOAN RECORD -->
         <div class="admin-card p-6 rounded-2xl lg:col-span-2">
           <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-user-plus text-blue-400"></i> Add New Loan Record (Cloud Firestore)
+            <i class="fa-solid fa-user-plus text-blue-400"></i> Add New Loan Record
           </h3>
           <form onsubmit="addLoanRecord(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div>
               <label class="block text-slate-400 font-bold mb-1">Customer Full Name</label>
-              <input type="text" id="newCustName" placeholder="e.g. Zahid Khan" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white" required>
+              <input type="text" id="newCustName" placeholder="e.g. Brahumdagh" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white" required>
             </div>
             <div>
-              <label class="block text-slate-400 font-bold mb-1">6-Digit Passcode (Code)</label>
-              <input type="text" id="newCustCode" maxlength="6" placeholder="e.g. 123456" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-amber-400 font-bold font-mono" required>
+              <label class="block text-slate-400 font-bold mb-1">6-Digit Passcode</label>
+              <input type="text" id="newCustCode" maxlength="6" placeholder="e.g. 888890" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-amber-400 font-bold font-mono" required>
             </div>
             <div>
               <label class="block text-slate-400 font-bold mb-1">Approved Loan Amount (PKR)</label>
-              <input type="number" id="newLoanAmt" placeholder="100000" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white" required>
+              <input type="number" id="newLoanAmt" placeholder="140000" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white" required>
             </div>
             <div>
               <label class="block text-slate-400 font-bold mb-1">Total Payable Amount (PKR)</label>
-              <input type="number" id="newPayableAmt" placeholder="120000" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white" required>
+              <input type="number" id="newPayableAmt" placeholder="140000" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white" required>
             </div>
             <div>
               <label class="block text-slate-400 font-bold mb-1">Approval Date</label>
@@ -143,7 +142,7 @@
         </div>
       </div>
 
-      <!-- LOAN RECORDS LIST -->
+      <!-- LOAN LIST -->
       <div class="admin-card p-6 rounded-2xl">
         <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
           <i class="fa-solid fa-list-check text-blue-400"></i> Cloud Registered Loans
@@ -153,10 +152,10 @@
             <thead class="bg-slate-900 text-slate-400 uppercase">
               <tr>
                 <th class="p-3">Loan ID</th>
-                <th class="p-3">6-Digit Code</th>
+                <th class="p-3">Code</th>
                 <th class="p-3">Customer</th>
-                <th class="p-3">Total Payable</th>
-                <th class="p-3">Paid Amount</th>
+                <th class="p-3">Payable</th>
+                <th class="p-3">Paid</th>
                 <th class="p-3">Remaining</th>
                 <th class="p-3 text-right">Actions</th>
               </tr>
@@ -169,7 +168,6 @@
   </div>
 
   <script>
-    // FIREBASE CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyAJt6q0qq0w2wy-MxhNXuRvL4MaDvPhLTQ",
       authDomain: "loansystem-6b088.firebaseapp.com",
@@ -183,32 +181,25 @@
       firebase.initializeApp(firebaseConfig);
     }
     const db = firebase.firestore();
-
     const CORRECT_ADMIN_PASS = "admin100";
 
-    function logActivity(message) {
-      const logContainer = document.getElementById('activityLogContainer');
-      const timeStr = new Date().toLocaleTimeString();
-      const logItem = document.createElement('div');
-      logItem.className = "text-emerald-400 border-b border-slate-800/60 pb-1";
-      logItem.innerHTML = `<span class="text-slate-500">[${timeStr}]</span> ${message}`;
-      logContainer.prepend(logItem);
+    function logActivity(msg) {
+      const c = document.getElementById('activityLogContainer');
+      const item = document.createElement('div');
+      item.className = "text-emerald-400";
+      item.innerText = `> ${msg}`;
+      c.prepend(item);
     }
 
     function handleAdminLogin(e) {
       e.preventDefault();
-      const user = document.getElementById('adminUser').value.trim();
-      const pass = document.getElementById('adminPass').value.trim();
-      const errorDiv = document.getElementById('loginError');
-
-      if (user === 'admin' && pass === CORRECT_ADMIN_PASS) {
-        errorDiv.classList.add('hidden');
+      if(document.getElementById('adminUser').value.trim() === 'admin' && document.getElementById('adminPass').value.trim() === CORRECT_ADMIN_PASS) {
         document.getElementById('adminLoginSection').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
-        logActivity("Admin successfully logged into the control panel.");
+        logActivity("Admin logged in successfully.");
         loadAdminData();
       } else {
-        errorDiv.classList.remove('hidden');
+        document.getElementById('loginError').classList.remove('hidden');
       }
     }
 
@@ -216,7 +207,6 @@
       document.getElementById('adminDashboard').classList.add('hidden');
       document.getElementById('adminLoginSection').classList.remove('hidden');
       document.getElementById('adminPass').value = '';
-      logActivity("Admin logged out of the session.");
     }
 
     async function loadAdminData() {
@@ -229,8 +219,7 @@
           document.getElementById('accSadaPay').value = acc.sadapay || '';
         }
       } catch (e) {
-        console.error(e);
-        logActivity("Error loading payment accounts: " + e.message);
+        logActivity("Error loading accounts: " + e.message);
       }
 
       try {
@@ -239,7 +228,7 @@
         tbody.innerHTML = '';
 
         if (snapshot.empty) {
-          tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No cloud loan records found. Add one above!</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No records found.</td></tr>`;
           return;
         }
 
@@ -247,50 +236,46 @@
           const l = docSnap.data();
           const docId = docSnap.id;
           const rem = l.payableAmount - l.paidAmount;
-
-          const row = `
+          tbody.innerHTML += `
             <tr class="hover:bg-slate-800/50">
               <td class="p-3 font-mono font-bold text-blue-400">${l.loanId}</td>
-              <td class="p-3 font-mono font-extrabold text-amber-400 bg-amber-500/10 rounded px-2">${l.code}</td>
+              <td class="p-3 font-mono font-extrabold text-amber-400">${l.code}</td>
               <td class="p-3 font-bold text-white">${l.customerName}</td>
               <td class="p-3 font-bold text-slate-300">Rs. ${l.payableAmount.toLocaleString()}</td>
               <td class="p-3 font-bold text-emerald-400">Rs. ${l.paidAmount.toLocaleString()}</td>
               <td class="p-3 font-bold text-rose-400">Rs. ${rem.toLocaleString()}</td>
               <td class="p-3 text-right space-x-2">
-                <button onclick="addPayment('${docId}', ${l.paidAmount}, '${l.customerName}')" class="px-2 py-1 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600 hover:text-white rounded text-[11px] font-bold">
-                  + Add Payment
-                </button>
-                <button onclick="deleteLoan('${docId}', '${l.customerName}')" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 hover:bg-red-600 hover:text-white rounded text-[11px] font-bold">
-                  Delete
-                </button>
+                <button onclick="addPayment('${docId}', ${l.paidAmount}, '${l.customerName}')" class="px-2 py-1 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded text-[11px] font-bold">+ Pay</button>
+                <button onclick="deleteLoan('${docId}', '${l.customerName}')" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 rounded text-[11px] font-bold">Del</button>
               </td>
-            </tr>
-          `;
-          tbody.innerHTML += row;
+            </tr>`;
         });
-        logActivity("Fetched " + snapshot.size + " loan records from Firebase.");
+        logActivity("Loaded loans from Firebase.");
       } catch (err) {
-        console.error(err);
-        logActivity("Error fetching loans: " + err.message);
+        logActivity("Error loading loans: " + err.message);
       }
     }
 
     async function saveAccounts(e) {
       e.preventDefault();
-      const accounts = {
-        easypaisa: document.getElementById('accEasyPaisa').value,
-        jazzcash: document.getElementById('accJazzCash').value,
-        sadapay: document.getElementById('accSadaPay').value
-      };
-      await db.collection('settings').doc('accounts').set(accounts);
-      alert('Payment Accounts saved to Firebase cloud successfully!');
-      logActivity("Updated merchant payment account numbers.");
+      try {
+        await db.collection('settings').doc('accounts').set({
+          easypaisa: document.getElementById('accEasyPaisa').value,
+          jazzcash: document.getElementById('accJazzCash').value,
+          sadapay: document.getElementById('accSadaPay').value
+        });
+        alert('Accounts saved!');
+        logActivity("Updated payment numbers.");
+      } catch(err) {
+        alert('Error: ' + err.message);
+      }
     }
 
     async function addLoanRecord(e) {
       e.preventDefault();
       const btn = document.getElementById('saveLoanBtn');
       btn.innerText = "Saving to Firebase...";
+      btn.disabled = true;
 
       const custName = document.getElementById('newCustName').value.trim();
       const newLoan = {
@@ -308,54 +293,60 @@
 
       try {
         await db.collection('loans').add(newLoan);
-        alert('Loan successfully saved to Firebase Cloud!');
-        logActivity(`Created new loan record for customer: ${custName}`);
+        alert('Loan successfully saved!');
+        logActivity(`Added loan for ${custName}`);
         loadAdminData();
         e.target.reset();
       } catch (err) {
-        console.error(err);
-        alert('Error saving to Firebase!');
-        logActivity("Failed to create loan record: " + err.message);
+        alert('Firebase Error: ' + err.message);
+        logActivity("Failed: " + err.message);
       } finally {
         btn.innerText = "CREATE & SAVE TO FIREBASE";
+        btn.disabled = false;
       }
     }
 
     async function addPayment(docId, currentPaid, custName) {
-      const amount = prompt("Enter payment amount collected (PKR):");
+      const amount = prompt("Enter payment amount (PKR):");
       if (amount && !isNaN(amount)) {
-        const payVal = parseFloat(amount);
-        const newPaid = currentPaid + payVal;
-        const newInst = {
-          num: Math.floor(Math.random() * 900) + 100,
-          dueDate: new Date().toISOString().split('T')[0],
-          amount: payVal,
-          paidDate: new Date().toISOString().split('T')[0],
-          status: 'PAID'
-        };
+        try {
+          const payVal = parseFloat(amount);
+          const docRef = db.collection('loans').doc(docId);
+          const docSnap = await docRef.get();
+          const installments = docSnap.data().installments || [];
+          
+          installments.push({
+            num: installments.length + 1,
+            dueDate: new Date().toISOString().split('T')[0],
+            amount: payVal,
+            paidDate: new Date().toISOString().split('T')[0],
+            status: 'PAID'
+          });
 
-        const docRef = db.collection('loans').doc(docId);
-        const docSnap = await docRef.get();
-        const existingInstallments = docSnap.data().installments || [];
-        existingInstallments.push(newInst);
+          await docRef.update({
+            paidAmount: currentPaid + payVal,
+            installments: installments
+          });
 
-        await docRef.update({
-          paidAmount: newPaid,
-          installments: existingInstallments
-        });
-
-        alert("Payment recorded successfully!");
-        logActivity(`Added payment of Rs. ${payVal} for customer: ${custName}`);
-        loadAdminData();
+          alert("Payment recorded!");
+          logActivity(`Added payment of Rs. ${payVal} for ${custName}`);
+          loadAdminData();
+        } catch(err) {
+          alert("Error: " + err.message);
+        }
       }
     }
 
     async function deleteLoan(docId, custName) {
-      if (confirm("Are you sure you want to delete this loan record from Firebase?")) {
-        await db.collection('loans').doc(docId).delete();
-        alert("Loan record deleted.");
-        logActivity(`Deleted loan record for customer: ${custName}`);
-        loadAdminData();
+      if (confirm("Delete this loan?")) {
+        try {
+          await db.collection('loans').doc(docId).delete();
+          alert("Deleted!");
+          logActivity(`Deleted loan for ${custName}`);
+          loadAdminData();
+        } catch(err) {
+          alert("Error: " + err.message);
+        }
       }
     }
   </script>
