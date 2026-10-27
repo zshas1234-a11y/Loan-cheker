@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel — Advanced Loan Control Center</title>
+  <title>Admin Panel — Loan Control Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -65,7 +65,7 @@
 
     <main class="max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 flex-grow">
       
-      <!-- ADVANCED LIVE ACTIVITY & ERROR LOG SYSTEM -->
+      <!-- LIVE ACTIVITY & ERROR LOG PANEL -->
       <div class="admin-card p-5 rounded-2xl border-l-4 border-l-cyan-500 shadow-xl" id="logSection">
         <div class="flex justify-between items-center mb-3">
           <h3 class="text-xs font-extrabold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
@@ -73,8 +73,8 @@
           </h3>
           <button onclick="clearLogs()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700 transition">Clear Logs</button>
         </div>
-        <div id="activityLogContainer" class="bg-slate-950 rounded-xl p-3 h-32 overflow-y-auto space-y-1.5 font-mono text-[11px] border border-slate-800">
-          <div class="text-slate-500">[System] Initialized cloud dashboard. Waiting for actions...</div>
+        <div id="activityLogContainer" class="bg-slate-950 rounded-xl p-3 h-28 overflow-y-auto space-y-1.5 font-mono text-[11px] border border-slate-800">
+          <div class="text-slate-500">[System] Initialized cloud dashboard. Ready...</div>
         </div>
       </div>
 
@@ -196,8 +196,6 @@
         item.innerText = `[${timeStr}] SUCCESS: ${msg}`;
       }
       c.prepend(item);
-      
-      // Automatically scroll log view to the section
       document.getElementById('logSection').scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -315,17 +313,41 @@
         installments: []
       };
 
+      // TIMEOUT SAFETY: 7 seconds ke andar agar firebase response na de toh button stuck nahi hoga
+      let isCompleted = false;
+      const timeoutId = setTimeout(() => {
+        if (!isCompleted) {
+          isCompleted = true;
+          btn.innerText = "CREATE & SAVE TO FIREBASE";
+          btn.disabled = false;
+          logActivity("Timeout: Firebase response mein dair ho rahi hai. Connection check karein.", true);
+          alert("Connection Timeout! Firebase save request waqt par mukammal nahi hui. Internet ya Rules check karein.");
+        }
+      }, 7000);
+
       try {
         logActivity(`Attempting to push new loan record for [${custName}] to Firestore...`);
         await db.collection('loans').add(newLoan);
-        logActivity(`Successfully saved loan record for ${custName} into Firebase!`);
-        alert('Loan successfully saved to cloud database!');
-        loadAdminData();
-        e.target.reset();
+        
+        if (!isCompleted) {
+          isCompleted = true;
+          clearTimeout(timeoutId);
+          logActivity(`Successfully saved loan record for ${custName} into Firebase!`);
+          alert('Loan successfully saved to cloud database!');
+          loadAdminData();
+          e.target.reset();
+        }
       } catch (err) {
-        logActivity(`Firebase Write Failed: ${err.message}`, true);
-        alert('Firebase Error: ' + err.message + '\n\n(Tip: Check your Firebase Console Firestore Rules!)');
+        if (!isCompleted) {
+          isCompleted = true;
+          clearTimeout(timeoutId);
+          logActivity(`Firebase Write Failed: ${err.message}`, true);
+          alert('Firebase Error: ' + err.message);
+        }
       } finally {
+        if (!isCompleted) {
+          isCompleted = true;
+        }
         btn.innerText = "CREATE & SAVE TO FIREBASE";
         btn.disabled = false;
       }
