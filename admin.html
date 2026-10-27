@@ -37,7 +37,7 @@
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Password</label>
-          <input type="password" id="adminPass" placeholder="Enter admin password" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none focus:border-blue-500 text-sm" required>
+          <input type="password" id="adminPass" placeholder="Enter password" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none focus:border-blue-500 text-sm" required>
         </div>
         <div id="loginError" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-400 font-bold text-center">
           <i class="fa-solid fa-triangle-exclamation mr-1"></i> Incorrect Password! Use admin100.
@@ -64,6 +64,20 @@
     </header>
 
     <main class="max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 flex-grow">
+      
+      <!-- TOP LIVE ACTIVITY & AUDIT LOG PANEL -->
+      <div class="admin-card p-5 rounded-2xl border-l-4 border-l-cyan-500">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="text-xs font-extrabold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-terminal"></i> Live Admin Activity & Audit Log
+          </h3>
+          <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-700">Real-time Tracker</span>
+        </div>
+        <div id="activityLogContainer" class="bg-slate-900/90 rounded-xl p-3 h-24 overflow-y-auto space-y-1.5 font-mono text-[11px] text-slate-300 border border-slate-800">
+          <div class="text-slate-500">[System] Initialized cloud session successfully. Waiting for admin actions...</div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- PAYMENT ACCOUNTS -->
@@ -155,7 +169,7 @@
   </div>
 
   <script>
-    // FIREBASE INITIALIZATION
+    // FIREBASE CONFIGURATION
     const firebaseConfig = {
       apiKey: "AIzaSyAJt6q0qq0w2wy-MxhNXuRvL4MaDvPhLTQ",
       authDomain: "loansystem-6b088.firebaseapp.com",
@@ -165,10 +179,21 @@
       appId: "1:734622223465:web:1f5b49334d6ae50cada6f8"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
 
     const CORRECT_ADMIN_PASS = "admin100";
+
+    function logActivity(message) {
+      const logContainer = document.getElementById('activityLogContainer');
+      const timeStr = new Date().toLocaleTimeString();
+      const logItem = document.createElement('div');
+      logItem.className = "text-emerald-400 border-b border-slate-800/60 pb-1";
+      logItem.innerHTML = `<span class="text-slate-500">[${timeStr}]</span> ${message}`;
+      logContainer.prepend(logItem);
+    }
 
     function handleAdminLogin(e) {
       e.preventDefault();
@@ -180,6 +205,7 @@
         errorDiv.classList.add('hidden');
         document.getElementById('adminLoginSection').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
+        logActivity("Admin successfully logged into the control panel.");
         loadAdminData();
       } else {
         errorDiv.classList.remove('hidden');
@@ -190,6 +216,7 @@
       document.getElementById('adminDashboard').classList.add('hidden');
       document.getElementById('adminLoginSection').classList.remove('hidden');
       document.getElementById('adminPass').value = '';
+      logActivity("Admin logged out of the session.");
     }
 
     async function loadAdminData() {
@@ -203,6 +230,7 @@
         }
       } catch (e) {
         console.error(e);
+        logActivity("Error loading payment accounts: " + e.message);
       }
 
       try {
@@ -229,10 +257,10 @@
               <td class="p-3 font-bold text-emerald-400">Rs. ${l.paidAmount.toLocaleString()}</td>
               <td class="p-3 font-bold text-rose-400">Rs. ${rem.toLocaleString()}</td>
               <td class="p-3 text-right space-x-2">
-                <button onclick="addPayment('${docId}', ${l.paidAmount}, ${l.payableAmount})" class="px-2 py-1 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600 hover:text-white rounded text-[11px] font-bold">
+                <button onclick="addPayment('${docId}', ${l.paidAmount}, '${l.customerName}')" class="px-2 py-1 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600 hover:text-white rounded text-[11px] font-bold">
                   + Add Payment
                 </button>
-                <button onclick="deleteLoan('${docId}')" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 hover:bg-red-600 hover:text-white rounded text-[11px] font-bold">
+                <button onclick="deleteLoan('${docId}', '${l.customerName}')" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 hover:bg-red-600 hover:text-white rounded text-[11px] font-bold">
                   Delete
                 </button>
               </td>
@@ -240,8 +268,10 @@
           `;
           tbody.innerHTML += row;
         });
+        logActivity("Fetched " + snapshot.size + " loan records from Firebase.");
       } catch (err) {
         console.error(err);
+        logActivity("Error fetching loans: " + err.message);
       }
     }
 
@@ -254,6 +284,7 @@
       };
       await db.collection('settings').doc('accounts').set(accounts);
       alert('Payment Accounts saved to Firebase cloud successfully!');
+      logActivity("Updated merchant payment account numbers.");
     }
 
     async function addLoanRecord(e) {
@@ -261,10 +292,11 @@
       const btn = document.getElementById('saveLoanBtn');
       btn.innerText = "Saving to Firebase...";
 
+      const custName = document.getElementById('newCustName').value.trim();
       const newLoan = {
         loanId: 'LCN-' + Math.floor(1000 + Math.random() * 9000),
         code: document.getElementById('newCustCode').value.trim(),
-        customerName: document.getElementById('newCustName').value.trim(),
+        customerName: custName,
         totalLoan: parseFloat(document.getElementById('newLoanAmt').value),
         payableAmount: parseFloat(document.getElementById('newPayableAmt').value),
         paidAmount: 0,
@@ -277,17 +309,19 @@
       try {
         await db.collection('loans').add(newLoan);
         alert('Loan successfully saved to Firebase Cloud!');
+        logActivity(`Created new loan record for customer: ${custName}`);
         loadAdminData();
         e.target.reset();
       } catch (err) {
         console.error(err);
         alert('Error saving to Firebase!');
+        logActivity("Failed to create loan record: " + err.message);
       } finally {
         btn.innerText = "CREATE & SAVE TO FIREBASE";
       }
     }
 
-    async function addPayment(docId, currentPaid, payable) {
+    async function addPayment(docId, currentPaid, custName) {
       const amount = prompt("Enter payment amount collected (PKR):");
       if (amount && !isNaN(amount)) {
         const payVal = parseFloat(amount);
@@ -310,13 +344,17 @@
           installments: existingInstallments
         });
 
+        alert("Payment recorded successfully!");
+        logActivity(`Added payment of Rs. ${payVal} for customer: ${custName}`);
         loadAdminData();
       }
     }
 
-    async function deleteLoan(docId) {
+    async function deleteLoan(docId, custName) {
       if (confirm("Are you sure you want to delete this loan record from Firebase?")) {
         await db.collection('loans').doc(docId).delete();
+        alert("Loan record deleted.");
+        logActivity(`Deleted loan record for customer: ${custName}`);
         loadAdminData();
       }
     }
