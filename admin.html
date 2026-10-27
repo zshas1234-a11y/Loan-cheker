@@ -7,6 +7,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
     .admin-card { background: #1e293b; border: 1px solid #334155; }
@@ -21,8 +26,8 @@
         <div class="w-16 h-16 bg-blue-600/20 border border-blue-500/40 rounded-2xl mx-auto flex items-center justify-center text-blue-400 text-2xl mb-3">
           <i class="fa-solid fa-user-shield"></i>
         </div>
-        <h2 class="text-2xl font-black text-white">Admin Control Login</h2>
-        <p class="text-slate-400 text-xs mt-1">Default Password: <strong class="text-amber-400">admin100</strong></p>
+        <h2 class="text-2xl font-black text-white">Admin Cloud Login</h2>
+        <p class="text-slate-400 text-xs mt-1">Password: <strong class="text-amber-400">admin100</strong></p>
       </div>
 
       <form onsubmit="handleAdminLogin(event)" class="space-y-4">
@@ -35,7 +40,7 @@
           <input type="password" id="adminPass" placeholder="Enter admin password" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none focus:border-blue-500 text-sm" required>
         </div>
         <div id="loginError" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-400 font-bold text-center">
-          <i class="fa-solid fa-triangle-exclamation mr-1"></i> गलत पासवर्ड! कृपया "admin100" दर्ज करें।
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> Incorrect Password! Use admin100.
         </div>
         <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-extrabold text-white transition shadow-lg shadow-blue-600/30">
           LOGIN TO ADMIN PANEL
@@ -44,13 +49,13 @@
     </div>
   </div>
 
-  <!-- ADMIN DASHBOARD CONTAINER (HIDDEN) -->
+  <!-- ADMIN DASHBOARD CONTAINER -->
   <div id="adminDashboard" class="hidden min-h-screen flex flex-col">
     <header class="bg-slate-900 border-b border-slate-800 p-4">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <span class="p-2 bg-blue-600 rounded-lg text-white font-black"><i class="fa-solid fa-gear"></i></span>
-          <h1 class="font-extrabold text-lg text-white">ADMIN PORTAL MANAGER</h1>
+          <span class="p-2 bg-blue-600 rounded-lg text-white font-black"><i class="fa-solid fa-cloud"></i></span>
+          <h1 class="font-extrabold text-lg text-white">ADMIN CLOUD MANAGER</h1>
         </div>
         <button onclick="adminLogout()" class="px-3 py-1.5 bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500 hover:text-white rounded-lg text-xs font-bold transition">
           <i class="fa-solid fa-power-off mr-1"></i> Logout
@@ -59,11 +64,9 @@
     </header>
 
     <main class="max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 flex-grow">
-      
-      <!-- SETTINGS & ADD LOAN GRID -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- SETTINGS: PAYMENT ACCOUNTS -->
+        <!-- PAYMENT ACCOUNTS -->
         <div class="admin-card p-6 rounded-2xl">
           <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
             <i class="fa-solid fa-wallet text-blue-400"></i> Admin Payment Numbers
@@ -87,10 +90,10 @@
           </form>
         </div>
 
-        <!-- ADD NEW CUSTOMER LOAN -->
+        <!-- ADD NEW LOAN RECORD -->
         <div class="admin-card p-6 rounded-2xl lg:col-span-2">
           <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-user-plus text-blue-400"></i> Add New Loan Record
+            <i class="fa-solid fa-user-plus text-blue-400"></i> Add New Loan Record (Cloud Firestore)
           </h3>
           <form onsubmit="addLoanRecord(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div>
@@ -118,19 +121,18 @@
               <input type="date" id="newDueDate" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white" required>
             </div>
             <div class="sm:col-span-2">
-              <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 font-extrabold text-white rounded-lg transition">
-                CREATE & SAVE LOAN RECORD
+              <button type="submit" id="saveLoanBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 font-extrabold text-white rounded-lg transition">
+                CREATE & SAVE TO FIREBASE
               </button>
             </div>
           </form>
         </div>
-
       </div>
 
       <!-- LOAN RECORDS LIST -->
       <div class="admin-card p-6 rounded-2xl">
         <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-blue-400"></i> Active Registered Loans
+          <i class="fa-solid fa-list-check text-blue-400"></i> Cloud Registered Loans
         </h3>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs">
@@ -145,18 +147,28 @@
                 <th class="p-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody id="adminLoanTable" class="divide-y divide-slate-800">
-              <!-- Dynamic Rows -->
-            </tbody>
+            <tbody id="adminLoanTable" class="divide-y divide-slate-800"></tbody>
           </table>
         </div>
       </div>
-
     </main>
   </div>
 
   <script>
-    const CORRECT_ADMIN_PASS = "admin100"; // आपका फिक्स पासवर्ड
+    // FIREBASE INITIALIZATION
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJt6q0qq0w2wy-MxhNXuRvL4MaDvPhLTQ",
+      authDomain: "loansystem-6b088.firebaseapp.com",
+      projectId: "loansystem-6b088",
+      storageBucket: "loansystem-6b088.firebasestorage.app",
+      messagingSenderId: "734622223465",
+      appId: "1:734622223465:web:1f5b49334d6ae50cada6f8"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const CORRECT_ADMIN_PASS = "admin100";
 
     function handleAdminLogin(e) {
       e.preventDefault();
@@ -180,59 +192,75 @@
       document.getElementById('adminPass').value = '';
     }
 
-    function loadAdminData() {
-      const accounts = JSON.parse(localStorage.getItem('portal_payment_accounts') || '{"easypaisa":"03001234567","jazzcash":"03007654321","sadapay":"03001122334"}');
-      document.getElementById('accEasyPaisa').value = accounts.easypaisa;
-      document.getElementById('accJazzCash').value = accounts.jazzcash;
-      document.getElementById('accSadaPay').value = accounts.sadapay;
-
-      const loans = JSON.parse(localStorage.getItem('portal_loans') || '[]');
-      const tbody = document.getElementById('adminLoanTable');
-      tbody.innerHTML = '';
-
-      if (loans.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No loan records found. Add one above!</td></tr>`;
-        return;
+    async function loadAdminData() {
+      try {
+        const accDoc = await db.collection('settings').doc('accounts').get();
+        if (accDoc.exists) {
+          const acc = accDoc.data();
+          document.getElementById('accEasyPaisa').value = acc.easypaisa || '';
+          document.getElementById('accJazzCash').value = acc.jazzcash || '';
+          document.getElementById('accSadaPay').value = acc.sadapay || '';
+        }
+      } catch (e) {
+        console.error(e);
       }
 
-      loans.forEach((l, idx) => {
-        const rem = l.payableAmount - l.paidAmount;
-        const row = `
-          <tr class="hover:bg-slate-800/50">
-            <td class="p-3 font-mono font-bold text-blue-400">${l.loanId}</td>
-            <td class="p-3 font-mono font-extrabold text-amber-400 bg-amber-500/10 rounded px-2">${l.code}</td>
-            <td class="p-3 font-bold text-white">${l.customerName}</td>
-            <td class="p-3 font-bold text-slate-300">Rs. ${l.payableAmount.toLocaleString()}</td>
-            <td class="p-3 font-bold text-emerald-400">Rs. ${l.paidAmount.toLocaleString()}</td>
-            <td class="p-3 font-bold text-rose-400">Rs. ${rem.toLocaleString()}</td>
-            <td class="p-3 text-right space-x-2">
-              <button onclick="addPaymentPrompt(${idx})" class="px-2 py-1 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600 hover:text-white rounded text-[11px] font-bold">
-                + Add Payment
-              </button>
-              <button onclick="deleteLoan(${idx})" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 hover:bg-red-600 hover:text-white rounded text-[11px] font-bold">
-                Delete
-              </button>
-            </td>
-          </tr>
-        `;
-        tbody.innerHTML += row;
-      });
+      try {
+        const snapshot = await db.collection('loans').get();
+        const tbody = document.getElementById('adminLoanTable');
+        tbody.innerHTML = '';
+
+        if (snapshot.empty) {
+          tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No cloud loan records found. Add one above!</td></tr>`;
+          return;
+        }
+
+        snapshot.forEach(docSnap => {
+          const l = docSnap.data();
+          const docId = docSnap.id;
+          const rem = l.payableAmount - l.paidAmount;
+
+          const row = `
+            <tr class="hover:bg-slate-800/50">
+              <td class="p-3 font-mono font-bold text-blue-400">${l.loanId}</td>
+              <td class="p-3 font-mono font-extrabold text-amber-400 bg-amber-500/10 rounded px-2">${l.code}</td>
+              <td class="p-3 font-bold text-white">${l.customerName}</td>
+              <td class="p-3 font-bold text-slate-300">Rs. ${l.payableAmount.toLocaleString()}</td>
+              <td class="p-3 font-bold text-emerald-400">Rs. ${l.paidAmount.toLocaleString()}</td>
+              <td class="p-3 font-bold text-rose-400">Rs. ${rem.toLocaleString()}</td>
+              <td class="p-3 text-right space-x-2">
+                <button onclick="addPayment('${docId}', ${l.paidAmount}, ${l.payableAmount})" class="px-2 py-1 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-600 hover:text-white rounded text-[11px] font-bold">
+                  + Add Payment
+                </button>
+                <button onclick="deleteLoan('${docId}')" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 hover:bg-red-600 hover:text-white rounded text-[11px] font-bold">
+                  Delete
+                </button>
+              </td>
+            </tr>
+          `;
+          tbody.innerHTML += row;
+        });
+      } catch (err) {
+        console.error(err);
+      }
     }
 
-    function saveAccounts(e) {
+    async function saveAccounts(e) {
       e.preventDefault();
       const accounts = {
         easypaisa: document.getElementById('accEasyPaisa').value,
         jazzcash: document.getElementById('accJazzCash').value,
         sadapay: document.getElementById('accSadaPay').value
       };
-      localStorage.setItem('portal_payment_accounts', JSON.stringify(accounts));
-      alert('Payment Accounts updated successfully!');
+      await db.collection('settings').doc('accounts').set(accounts);
+      alert('Payment Accounts saved to Firebase cloud successfully!');
     }
 
-    function addLoanRecord(e) {
+    async function addLoanRecord(e) {
       e.preventDefault();
-      const loans = JSON.parse(localStorage.getItem('portal_loans') || '[]');
+      const btn = document.getElementById('saveLoanBtn');
+      btn.innerText = "Saving to Firebase...";
+
       const newLoan = {
         loanId: 'LCN-' + Math.floor(1000 + Math.random() * 9000),
         code: document.getElementById('newCustCode').value.trim(),
@@ -246,35 +274,49 @@
         installments: []
       };
 
-      loans.push(newLoan);
-      localStorage.setItem('portal_loans', JSON.stringify(loans));
-      alert('New Loan Added Successfully!');
-      loadAdminData();
-      e.target.reset();
+      try {
+        await db.collection('loans').add(newLoan);
+        alert('Loan successfully saved to Firebase Cloud!');
+        loadAdminData();
+        e.target.reset();
+      } catch (err) {
+        console.error(err);
+        alert('Error saving to Firebase!');
+      } finally {
+        btn.innerText = "CREATE & SAVE TO FIREBASE";
+      }
     }
 
-    function addPaymentPrompt(index) {
-      const loans = JSON.parse(localStorage.getItem('portal_loans') || '[]');
+    async function addPayment(docId, currentPaid, payable) {
       const amount = prompt("Enter payment amount collected (PKR):");
-      if(amount && !isNaN(amount)) {
-        loans[index].paidAmount += parseFloat(amount);
-        loans[index].installments.push({
-          num: loans[index].installments.length + 1,
+      if (amount && !isNaN(amount)) {
+        const payVal = parseFloat(amount);
+        const newPaid = currentPaid + payVal;
+        const newInst = {
+          num: Math.floor(Math.random() * 900) + 100,
           dueDate: new Date().toISOString().split('T')[0],
-          amount: parseFloat(amount),
+          amount: payVal,
           paidDate: new Date().toISOString().split('T')[0],
           status: 'PAID'
+        };
+
+        const docRef = db.collection('loans').doc(docId);
+        const docSnap = await docRef.get();
+        const existingInstallments = docSnap.data().installments || [];
+        existingInstallments.push(newInst);
+
+        await docRef.update({
+          paidAmount: newPaid,
+          installments: existingInstallments
         });
-        localStorage.setItem('portal_loans', JSON.stringify(loans));
+
         loadAdminData();
       }
     }
 
-    function deleteLoan(index) {
-      if(confirm("Are you sure you want to delete this loan record?")) {
-        const loans = JSON.parse(localStorage.getItem('portal_loans') || '[]');
-        loans.splice(index, 1);
-        localStorage.setItem('portal_loans', JSON.stringify(loans));
+    async function deleteLoan(docId) {
+      if (confirm("Are you sure you want to delete this loan record from Firebase?")) {
+        await db.collection('loans').doc(docId).delete();
         loadAdminData();
       }
     }
