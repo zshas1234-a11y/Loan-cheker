@@ -74,7 +74,7 @@
           <button onclick="clearLogs()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700 transition">Clear Logs</button>
         </div>
         <div id="activityLogContainer" class="bg-slate-950 rounded-xl p-3 h-28 overflow-y-auto space-y-1.5 font-mono text-[11px] border border-slate-800">
-          <div class="text-slate-500">[System] Initialized cloud dashboard. Ready...</div>
+          <div class="text-slate-500">[System] Initializing Firebase connection...</div>
         </div>
       </div>
 
@@ -224,7 +224,7 @@
 
     async function loadAdminData() {
       try {
-        logActivity("Fetching settings and loans from Firestore...");
+        logActivity("Fetching settings from Firestore...");
         const accDoc = await db.collection('settings').doc('accounts').get();
         if (accDoc.exists) {
           const acc = accDoc.data();
@@ -233,17 +233,18 @@
           document.getElementById('accSadaPay').value = acc.sadapay || '';
         }
       } catch (e) {
-        logActivity("Failed to load account numbers: " + e.message, true);
+        logActivity("Failed to load accounts: " + e.message, true);
       }
 
       try {
+        logActivity("Fetching loans collection from Firestore...");
         const snapshot = await db.collection('loans').get();
         const tbody = document.getElementById('adminLoanTable');
         tbody.innerHTML = '';
 
         if (snapshot.empty) {
           tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No records found in cloud database.</td></tr>`;
-          logActivity("Connected to Firestore, but zero loan records found.");
+          logActivity("Connected to Firestore successfully (Zero loan records found).");
           return;
         }
 
@@ -261,13 +262,13 @@
               <td class="p-3 font-bold text-rose-400">Rs. ${rem.toLocaleString()}</td>
               <td class="p-3 text-right space-x-2">
                 <button onclick="addPayment('${docId}', ${l.paidAmount}, '${l.customerName}')" class="px-2 py-1 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded text-[11px] font-bold hover:bg-emerald-600 hover:text-white">+ Pay</button>
-                <button onclick="deleteLoan('${docId}', '${l.customerName}')" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 rounded text-[11px] font-bold hover:bg-red-600 hover:text-white">Del</button>
+                <button onclick="deleteLoan('${docId}', '${l.customerName}')" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 rounded text-[11px] font-bold hover:bg-red-600/30">Del</button>
               </td>
             </tr>`;
         });
-        logActivity(`Successfully loaded ${snapshot.size} loan records from cloud.`);
+        logActivity(`Successfully loaded ${snapshot.size} loan records.`);
       } catch (err) {
-        logActivity("CRITICAL ERROR loading loans: " + err.message, true);
+        logActivity("Firestore Connection Error: " + err.message, true);
       }
     }
 
@@ -282,10 +283,10 @@
           jazzcash: document.getElementById('accJazzCash').value,
           sadapay: document.getElementById('accSadaPay').value
         });
-        logActivity("Payment numbers updated successfully.");
+        logActivity("Payment numbers saved successfully.");
         alert('Accounts saved successfully!');
       } catch(err) {
-        logActivity("Failed to save payment accounts: " + err.message, true);
+        logActivity("Failed to save accounts: " + err.message, true);
         alert('Error: ' + err.message);
       } finally {
         btn.innerText = "Save Numbers";
@@ -313,41 +314,17 @@
         installments: []
       };
 
-      // TIMEOUT SAFETY: 7 seconds ke andar agar firebase response na de toh button stuck nahi hoga
-      let isCompleted = false;
-      const timeoutId = setTimeout(() => {
-        if (!isCompleted) {
-          isCompleted = true;
-          btn.innerText = "CREATE & SAVE TO FIREBASE";
-          btn.disabled = false;
-          logActivity("Timeout: Firebase response mein dair ho rahi hai. Connection check karein.", true);
-          alert("Connection Timeout! Firebase save request waqt par mukammal nahi hui. Internet ya Rules check karein.");
-        }
-      }, 7000);
-
       try {
-        logActivity(`Attempting to push new loan record for [${custName}] to Firestore...`);
+        logActivity(`Sending loan data for [${custName}] to Firebase...`);
         await db.collection('loans').add(newLoan);
-        
-        if (!isCompleted) {
-          isCompleted = true;
-          clearTimeout(timeoutId);
-          logActivity(`Successfully saved loan record for ${custName} into Firebase!`);
-          alert('Loan successfully saved to cloud database!');
-          loadAdminData();
-          e.target.reset();
-        }
+        logActivity(`Successfully saved loan record for ${custName}!`);
+        alert('Loan successfully saved to cloud database!');
+        loadAdminData();
+        e.target.reset();
       } catch (err) {
-        if (!isCompleted) {
-          isCompleted = true;
-          clearTimeout(timeoutId);
-          logActivity(`Firebase Write Failed: ${err.message}`, true);
-          alert('Firebase Error: ' + err.message);
-        }
+        logActivity(`Firebase Write Error: ${err.message}`, true);
+        alert('Firebase Error: ' + err.message);
       } finally {
-        if (!isCompleted) {
-          isCompleted = true;
-        }
         btn.innerText = "CREATE & SAVE TO FIREBASE";
         btn.disabled = false;
       }
@@ -358,7 +335,7 @@
       if (amount && !isNaN(amount)) {
         try {
           const payVal = parseFloat(amount);
-          logActivity(`Processing payment of Rs. ${payVal} for ${custName}...`);
+          logActivity(`Adding payment of Rs. ${payVal} for ${custName}...`);
           const docRef = db.collection('loans').doc(docId);
           const docSnap = await docRef.get();
           const installments = docSnap.data().installments || [];
@@ -376,11 +353,11 @@
             installments: installments
           });
 
-          logActivity(`Payment of Rs. ${payVal} recorded successfully for ${custName}.`);
+          logActivity(`Payment recorded for ${custName}.`);
           alert("Payment recorded successfully!");
           loadAdminData();
         } catch(err) {
-          logActivity("Payment update failed: " + err.message, true);
+          logActivity("Payment error: " + err.message, true);
           alert("Error: " + err.message);
         }
       }
@@ -389,13 +366,13 @@
     async function deleteLoan(docId, custName) {
       if (confirm(`Are you sure you want to delete loan record for ${custName}?`)) {
         try {
-          logActivity(`Deleting loan record [${custName}] from database...`);
+          logActivity(`Deleting loan record [${custName}]...`);
           await db.collection('loans').doc(docId).delete();
-          logActivity(`Loan record for ${custName} deleted successfully.`);
+          logActivity(`Loan record deleted.`);
           alert("Loan record deleted.");
           loadAdminData();
         } catch(err) {
-          logActivity("Failed to delete loan: " + err.message, true);
+          logActivity("Delete error: " + err.message, true);
           alert("Error: " + err.message);
         }
       }
