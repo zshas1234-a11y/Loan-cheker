@@ -22,20 +22,20 @@
           <i class="fa-solid fa-user-shield"></i>
         </div>
         <h2 class="text-2xl font-black text-white">Admin Control Login</h2>
-        <p class="text-slate-400 text-xs mt-1">Authorized Management Personnel Only</p>
+        <p class="text-slate-400 text-xs mt-1">Default Password: <strong class="text-amber-400">admin100</strong></p>
       </div>
 
       <form onsubmit="handleAdminLogin(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Username</label>
-          <input type="text" id="adminUser" value="admin" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none focus:border-blue-500 text-sm">
+          <input type="text" id="adminUser" value="admin" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none focus:border-blue-500 text-sm" required>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Password</label>
           <input type="password" id="adminPass" placeholder="Enter admin password" class="w-full p-3 rounded-xl bg-slate-900 border border-slate-700 text-white outline-none focus:border-blue-500 text-sm" required>
         </div>
-        <div id="loginError" class="hidden text-xs text-red-400 font-bold text-center">
-          Invalid Admin Credentials!
+        <div id="loginError" class="hidden p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-400 font-bold text-center">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> गलत पासवर्ड! कृपया "admin100" दर्ज करें।
         </div>
         <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-extrabold text-white transition shadow-lg shadow-blue-600/30">
           LOGIN TO ADMIN PANEL
@@ -71,15 +71,15 @@
           <form onsubmit="saveAccounts(event)" class="space-y-3 text-xs">
             <div>
               <label class="block text-slate-400 font-bold mb-1">EasyPaisa Number</label>
-              <input type="text" id="accEasyPaisa" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-emerald-400 font-mono font-bold">
+              <input type="text" id="accEasyPaisa" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-emerald-400 font-mono font-bold" required>
             </div>
             <div>
               <label class="block text-slate-400 font-bold mb-1">JazzCash Number</label>
-              <input type="text" id="accJazzCash" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-red-400 font-mono font-bold">
+              <input type="text" id="accJazzCash" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-red-400 font-mono font-bold" required>
             </div>
             <div>
               <label class="block text-slate-400 font-bold mb-1">SadaPay Number</label>
-              <input type="text" id="accSadaPay" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-teal-300 font-mono font-bold">
+              <input type="text" id="accSadaPay" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-teal-300 font-mono font-bold" required>
             </div>
             <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition mt-2">
               Save Payment Numbers
@@ -156,19 +156,21 @@
   </div>
 
   <script>
-    const ADMIN_PASS = 'admin100'; // Admin password as requested
+    const CORRECT_ADMIN_PASS = "admin100"; // आपका फिक्स पासवर्ड
 
     function handleAdminLogin(e) {
       e.preventDefault();
-      const user = document.getElementById('adminUser').value;
-      const pass = document.getElementById('adminPass').value;
+      const user = document.getElementById('adminUser').value.trim();
+      const pass = document.getElementById('adminPass').value.trim();
+      const errorDiv = document.getElementById('loginError');
 
-      if(user === 'admin' && pass === ADMIN_PASS) {
+      if (user === 'admin' && pass === CORRECT_ADMIN_PASS) {
+        errorDiv.classList.add('hidden');
         document.getElementById('adminLoginSection').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
         loadAdminData();
       } else {
-        document.getElementById('loginError').classList.remove('hidden');
+        errorDiv.classList.remove('hidden');
       }
     }
 
@@ -179,16 +181,19 @@
     }
 
     function loadAdminData() {
-      // Accounts
       const accounts = JSON.parse(localStorage.getItem('portal_payment_accounts') || '{"easypaisa":"03001234567","jazzcash":"03007654321","sadapay":"03001122334"}');
       document.getElementById('accEasyPaisa').value = accounts.easypaisa;
       document.getElementById('accJazzCash').value = accounts.jazzcash;
       document.getElementById('accSadaPay').value = accounts.sadapay;
 
-      // Loans Table
       const loans = JSON.parse(localStorage.getItem('portal_loans') || '[]');
       const tbody = document.getElementById('adminLoanTable');
       tbody.innerHTML = '';
+
+      if (loans.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No loan records found. Add one above!</td></tr>`;
+        return;
+      }
 
       loans.forEach((l, idx) => {
         const rem = l.payableAmount - l.paidAmount;
@@ -230,8 +235,8 @@
       const loans = JSON.parse(localStorage.getItem('portal_loans') || '[]');
       const newLoan = {
         loanId: 'LCN-' + Math.floor(1000 + Math.random() * 9000),
-        code: document.getElementById('newCustCode').value,
-        customerName: document.getElementById('newCustName').value,
+        code: document.getElementById('newCustCode').value.trim(),
+        customerName: document.getElementById('newCustName').value.trim(),
         totalLoan: parseFloat(document.getElementById('newLoanAmt').value),
         payableAmount: parseFloat(document.getElementById('newPayableAmt').value),
         paidAmount: 0,
@@ -245,6 +250,7 @@
       localStorage.setItem('portal_loans', JSON.stringify(loans));
       alert('New Loan Added Successfully!');
       loadAdminData();
+      e.target.reset();
     }
 
     function addPaymentPrompt(index) {
