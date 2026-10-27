@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel — Loan Control Center</title>
+  <title>Admin Panel — Advanced Loan Control Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,7 @@
     .admin-card { background: #1e293b; border: 1px solid #334155; }
   </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen flex flex-col justify-between">
 
   <!-- ADMIN LOGIN SECTION -->
   <div id="adminLoginSection" class="min-h-screen flex items-center justify-center p-4">
@@ -51,7 +51,7 @@
 
   <!-- ADMIN DASHBOARD CONTAINER -->
   <div id="adminDashboard" class="hidden min-h-screen flex flex-col">
-    <header class="bg-slate-900 border-b border-slate-800 p-4">
+    <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-50">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         <div class="flex items-center space-x-3">
           <span class="p-2 bg-blue-600 rounded-lg text-white font-black"><i class="fa-solid fa-cloud"></i></span>
@@ -65,22 +65,23 @@
 
     <main class="max-w-7xl mx-auto w-full p-4 sm:p-6 space-y-6 flex-grow">
       
-      <!-- LOG PANEL -->
-      <div class="admin-card p-5 rounded-2xl border-l-4 border-l-cyan-500">
+      <!-- ADVANCED LIVE ACTIVITY & ERROR LOG SYSTEM -->
+      <div class="admin-card p-5 rounded-2xl border-l-4 border-l-cyan-500 shadow-xl" id="logSection">
         <div class="flex justify-between items-center mb-3">
           <h3 class="text-xs font-extrabold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
-            <i class="fa-solid fa-terminal"></i> Live Activity & Audit Log
+            <i class="fa-solid fa-terminal"></i> Live System Logs & Error Tracer
           </h3>
+          <button onclick="clearLogs()" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700 transition">Clear Logs</button>
         </div>
-        <div id="activityLogContainer" class="bg-slate-900/90 rounded-xl p-3 h-20 overflow-y-auto space-y-1 font-mono text-[11px] text-slate-300 border border-slate-800">
-          <div class="text-slate-550">[System] Connected. Ready for actions...</div>
+        <div id="activityLogContainer" class="bg-slate-950 rounded-xl p-3 h-32 overflow-y-auto space-y-1.5 font-mono text-[11px] border border-slate-800">
+          <div class="text-slate-500">[System] Initialized cloud dashboard. Waiting for actions...</div>
         </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- PAYMENT ACCOUNTS -->
-        <div class="admin-card p-6 rounded-2xl">
+        <div class="admin-card p-6 rounded-2xl shadow-xl">
           <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
             <i class="fa-solid fa-wallet text-blue-400"></i> Payment Numbers
           </h3>
@@ -97,14 +98,14 @@
               <label class="block text-slate-400 font-bold mb-1">SadaPay</label>
               <input type="text" id="accSadaPay" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-teal-300 font-mono font-bold" required>
             </div>
-            <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition mt-2">
+            <button type="submit" id="saveAccBtn" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition mt-2">
               Save Numbers
             </button>
           </form>
         </div>
 
         <!-- ADD NEW LOAN RECORD -->
-        <div class="admin-card p-6 rounded-2xl lg:col-span-2">
+        <div class="admin-card p-6 rounded-2xl lg:col-span-2 shadow-xl">
           <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
             <i class="fa-solid fa-user-plus text-blue-400"></i> Add New Loan Record
           </h3>
@@ -134,7 +135,7 @@
               <input type="date" id="newDueDate" class="w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-white" required>
             </div>
             <div class="sm:col-span-2">
-              <button type="submit" id="saveLoanBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 font-extrabold text-white rounded-lg transition">
+              <button type="submit" id="saveLoanBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-500 font-extrabold text-white rounded-lg transition tracking-wide">
                 CREATE & SAVE TO FIREBASE
               </button>
             </div>
@@ -143,7 +144,7 @@
       </div>
 
       <!-- LOAN LIST -->
-      <div class="admin-card p-6 rounded-2xl">
+      <div class="admin-card p-6 rounded-2xl shadow-xl">
         <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
           <i class="fa-solid fa-list-check text-blue-400"></i> Cloud Registered Loans
         </h3>
@@ -183,12 +184,25 @@
     const db = firebase.firestore();
     const CORRECT_ADMIN_PASS = "admin100";
 
-    function logActivity(msg) {
+    function logActivity(msg, isError = false) {
       const c = document.getElementById('activityLogContainer');
       const item = document.createElement('div');
-      item.className = "text-emerald-400";
-      item.innerText = `> ${msg}`;
+      const timeStr = new Date().toLocaleTimeString();
+      if(isError) {
+        item.className = "text-rose-400 font-bold bg-rose-500/10 p-1 rounded border border-rose-500/20";
+        item.innerText = `[${timeStr}] ERROR: ${msg}`;
+      } else {
+        item.className = "text-emerald-400";
+        item.innerText = `[${timeStr}] SUCCESS: ${msg}`;
+      }
       c.prepend(item);
+      
+      // Automatically scroll log view to the section
+      document.getElementById('logSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function clearLogs() {
+      document.getElementById('activityLogContainer').innerHTML = '<div class="text-slate-500">[System] Logs cleared.</div>';
     }
 
     function handleAdminLogin(e) {
@@ -196,10 +210,11 @@
       if(document.getElementById('adminUser').value.trim() === 'admin' && document.getElementById('adminPass').value.trim() === CORRECT_ADMIN_PASS) {
         document.getElementById('adminLoginSection').classList.add('hidden');
         document.getElementById('adminDashboard').classList.remove('hidden');
-        logActivity("Admin logged in successfully.");
+        logActivity("Admin logged into panel successfully.");
         loadAdminData();
       } else {
         document.getElementById('loginError').classList.remove('hidden');
+        logActivity("Failed login attempt with incorrect password.", true);
       }
     }
 
@@ -211,6 +226,7 @@
 
     async function loadAdminData() {
       try {
+        logActivity("Fetching settings and loans from Firestore...");
         const accDoc = await db.collection('settings').doc('accounts').get();
         if (accDoc.exists) {
           const acc = accDoc.data();
@@ -219,7 +235,7 @@
           document.getElementById('accSadaPay').value = acc.sadapay || '';
         }
       } catch (e) {
-        logActivity("Error loading accounts: " + e.message);
+        logActivity("Failed to load account numbers: " + e.message, true);
       }
 
       try {
@@ -228,7 +244,8 @@
         tbody.innerHTML = '';
 
         if (snapshot.empty) {
-          tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No records found.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No records found in cloud database.</td></tr>`;
+          logActivity("Connected to Firestore, but zero loan records found.");
           return;
         }
 
@@ -245,36 +262,43 @@
               <td class="p-3 font-bold text-emerald-400">Rs. ${l.paidAmount.toLocaleString()}</td>
               <td class="p-3 font-bold text-rose-400">Rs. ${rem.toLocaleString()}</td>
               <td class="p-3 text-right space-x-2">
-                <button onclick="addPayment('${docId}', ${l.paidAmount}, '${l.customerName}')" class="px-2 py-1 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded text-[11px] font-bold">+ Pay</button>
-                <button onclick="deleteLoan('${docId}', '${l.customerName}')" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 rounded text-[11px] font-bold">Del</button>
+                <button onclick="addPayment('${docId}', ${l.paidAmount}, '${l.customerName}')" class="px-2 py-1 bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded text-[11px] font-bold hover:bg-emerald-600 hover:text-white">+ Pay</button>
+                <button onclick="deleteLoan('${docId}', '${l.customerName}')" class="px-2 py-1 bg-red-600/30 text-red-300 border border-red-500/40 rounded text-[11px] font-bold hover:bg-red-600 hover:text-white">Del</button>
               </td>
             </tr>`;
         });
-        logActivity("Loaded loans from Firebase.");
+        logActivity(`Successfully loaded ${snapshot.size} loan records from cloud.`);
       } catch (err) {
-        logActivity("Error loading loans: " + err.message);
+        logActivity("CRITICAL ERROR loading loans: " + err.message, true);
       }
     }
 
     async function saveAccounts(e) {
       e.preventDefault();
+      const btn = document.getElementById('saveAccBtn');
+      btn.innerText = "Saving...";
+      btn.disabled = true;
       try {
         await db.collection('settings').doc('accounts').set({
           easypaisa: document.getElementById('accEasyPaisa').value,
           jazzcash: document.getElementById('accJazzCash').value,
           sadapay: document.getElementById('accSadaPay').value
         });
-        alert('Accounts saved!');
-        logActivity("Updated payment numbers.");
+        logActivity("Payment numbers updated successfully.");
+        alert('Accounts saved successfully!');
       } catch(err) {
+        logActivity("Failed to save payment accounts: " + err.message, true);
         alert('Error: ' + err.message);
+      } finally {
+        btn.innerText = "Save Numbers";
+        btn.disabled = false;
       }
     }
 
     async function addLoanRecord(e) {
       e.preventDefault();
       const btn = document.getElementById('saveLoanBtn');
-      btn.innerText = "Saving to Firebase...";
+      btn.innerText = "Saving to Firebase Cloud...";
       btn.disabled = true;
 
       const custName = document.getElementById('newCustName').value.trim();
@@ -292,14 +316,15 @@
       };
 
       try {
+        logActivity(`Attempting to push new loan record for [${custName}] to Firestore...`);
         await db.collection('loans').add(newLoan);
-        alert('Loan successfully saved!');
-        logActivity(`Added loan for ${custName}`);
+        logActivity(`Successfully saved loan record for ${custName} into Firebase!`);
+        alert('Loan successfully saved to cloud database!');
         loadAdminData();
         e.target.reset();
       } catch (err) {
-        alert('Firebase Error: ' + err.message);
-        logActivity("Failed: " + err.message);
+        logActivity(`Firebase Write Failed: ${err.message}`, true);
+        alert('Firebase Error: ' + err.message + '\n\n(Tip: Check your Firebase Console Firestore Rules!)');
       } finally {
         btn.innerText = "CREATE & SAVE TO FIREBASE";
         btn.disabled = false;
@@ -307,10 +332,11 @@
     }
 
     async function addPayment(docId, currentPaid, custName) {
-      const amount = prompt("Enter payment amount (PKR):");
+      const amount = prompt("Enter payment amount collected (PKR):");
       if (amount && !isNaN(amount)) {
         try {
           const payVal = parseFloat(amount);
+          logActivity(`Processing payment of Rs. ${payVal} for ${custName}...`);
           const docRef = db.collection('loans').doc(docId);
           const docSnap = await docRef.get();
           const installments = docSnap.data().installments || [];
@@ -328,23 +354,26 @@
             installments: installments
           });
 
-          alert("Payment recorded!");
-          logActivity(`Added payment of Rs. ${payVal} for ${custName}`);
+          logActivity(`Payment of Rs. ${payVal} recorded successfully for ${custName}.`);
+          alert("Payment recorded successfully!");
           loadAdminData();
         } catch(err) {
+          logActivity("Payment update failed: " + err.message, true);
           alert("Error: " + err.message);
         }
       }
     }
 
     async function deleteLoan(docId, custName) {
-      if (confirm("Delete this loan?")) {
+      if (confirm(`Are you sure you want to delete loan record for ${custName}?`)) {
         try {
+          logActivity(`Deleting loan record [${custName}] from database...`);
           await db.collection('loans').doc(docId).delete();
-          alert("Deleted!");
-          logActivity(`Deleted loan for ${custName}`);
+          logActivity(`Loan record for ${custName} deleted successfully.`);
+          alert("Loan record deleted.");
           loadAdminData();
         } catch(err) {
+          logActivity("Failed to delete loan: " + err.message, true);
           alert("Error: " + err.message);
         }
       }
