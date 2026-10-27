@@ -1,214 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loan Check Portal — Secure Client Access</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#101827" />
+  <title>Loan Check Portal</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b132b; color: #f8fafc; }
-    .glass-card { background: rgba(28, 37, 65, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-    .gold-gradient { background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%); }
-    .btn-glow { box-shadow: 0 0 20px rgba(0, 180, 216, 0.4); }
-    .btn-glow:hover { box-shadow: 0 0 30px rgba(0, 180, 216, 0.7); }
+    :root { color-scheme: light; }
+    * { font-family: "Plus Jakarta Sans", sans-serif; }
+    body { background: #f5f7fb; }
+    .glass { background: rgba(255,255,255,.88); backdrop-filter: blur(14px); }
+    .shadow-soft { box-shadow: 0 18px 50px rgba(20, 35, 70, .08); }
+    .field { width:100%; border:1px solid #dbe3ef; border-radius:12px; padding:12px 14px; outline:none; background:#fff; transition:.2s; }
+    .field:focus { border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.12); }
+    .btn { border-radius:12px; padding:11px 16px; font-weight:700; transition:transform .15s,opacity .15s; }
+    .btn:active { transform:scale(.98); }
+    .nav-active { background:#29364b; color:#fff; }
+    .console-line { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:11px; line-height:1.65; overflow-wrap:anywhere; }
+    .hidden-view { display:none !important; }
+    .status-dot { width:8px;height:8px;border-radius:50%;display:inline-block; }
+    .table-wrap { overflow-x:auto; }
+    .table-wrap table { min-width:760px; }
+    @media (max-width:640px) { .mobile-stack { flex-direction:column; align-items:stretch; } }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
-
-  <!-- HEADER -->
-  <header class="py-5 px-6 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
-    <div class="max-w-6xl mx-auto flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl gold-gradient flex items-center justify-center text-white text-xl font-black shadow-lg">
-          <i class="fa-solid fa-shield-halved"></i>
-        </div>
-        <div>
-          <h1 class="text-xl font-extrabold tracking-tight text-white">LOAN CHECK PORTAL</h1>
-          <p class="text-xs text-cyan-400 font-semibold tracking-wider">CLOUD SECURE SYSTEM</p>
-        </div>
-      </div>
-      <div class="hidden sm:flex items-center space-x-2 text-xs text-slate-400">
-        <i class="fa-solid fa-lock text-emerald-400"></i>
-        <span>Firebase Realtime Sync</span>
+<body class="min-h-screen text-slate-800">
+  <!-- Top bar shared by the customer portal and admin console -->
+  <header class="bg-[#101827] text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-3 min-w-0">
+        <div class="w-11 h-11 rounded-2xl bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20"><i class="fa-solid fa-landmark text-xl"></i></div>
+        <div><div class="font-extrabold tracking-tight text-lg">Loan<span class="text-indigo-400">Check</span></div><div class="text-xs text-slate-400">LOAN MANAGEMENT PORTAL</div></div>
+      </a>
+      <div class="flex items-center gap-2 text-xs sm:text-sm">
+        <span id="connectionPill" class="flex items-center gap-2 rounded-full border border-slate-700 px-3 py-2 text-slate-300"><span class="status-dot bg-amber-400"></span><span id="connectionText">Connecting…</span></span>
+        <a href="admin.html" id="adminLink" class="rounded-xl px-3 py-2 bg-slate-700 hover:bg-slate-600 font-semibold"><i class="fa-solid fa-shield-halved mr-1"></i><span class="hidden sm:inline">Admin</span></a>
+        <a href="index.html" id="customerLink" class="rounded-xl px-3 py-2 bg-slate-700 hover:bg-slate-600 font-semibold"><i class="fa-solid fa-user mr-1"></i><span class="hidden sm:inline">Customer</span></a>
       </div>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="flex-grow flex items-center justify-center p-4">
-    <div class="w-full max-w-xl">
-
-      <!-- STEP 1: VERIFICATION FORM -->
-      <div id="verifySection" class="glass-card rounded-3xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl"></div>
-
-        <div class="text-center mb-8">
-          <div class="w-16 h-16 bg-cyan-500/10 border border-cyan-500/30 rounded-2xl mx-auto flex items-center justify-center text-cyan-400 text-2xl mb-4">
-            <i class="fa-solid fa-key"></i>
-          </div>
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-white">Enter Your Access Code</h2>
-          <p class="text-slate-400 text-sm mt-2">Enter your assigned 6-digit loan passcode below.</p>
-        </div>
-
-        <form id="codeForm" onsubmit="handleVerification(event)" class="space-y-6">
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 text-center">6-Digit Loan Passcode</label>
-            <input 
-              type="text" 
-              id="loanCodeInput" 
-              maxlength="6" 
-              placeholder="e.g. 666666" 
-              class="w-full text-center text-3xl font-extrabold tracking-[0.3em] py-4 px-6 rounded-2xl bg-slate-900/90 border-2 border-slate-700 text-cyan-400 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-500/20 outline-none transition-all duration-300 placeholder:text-slate-600 placeholder:tracking-normal placeholder:text-lg"
-              required 
-              autocomplete="off"
-            >
-          </div>
-
-          <div id="errorMessage" class="hidden p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center font-medium">
-            <i class="fa-solid fa-circle-exclamation mr-2"></i> Invalid passcode or connection error. Please try again.
-          </div>
-
-          <button 
-            type="submit" 
-            id="verifyBtn"
-            class="w-full py-4 rounded-2xl gold-gradient text-white text-lg font-extrabold tracking-wide btn-glow hover:opacity-95 transition duration-300 flex items-center justify-center space-x-2"
-          >
-            <span>CHECK LOAN STATUS</span>
-            <i class="fa-solid fa-arrow-right text-sm"></i>
-          </button>
-        </form>
+  <!-- CUSTOMER VIEW -->
+  <main id="customerView" class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <section class="grid lg:grid-cols-[1.05fr_.95fr] gap-8 items-center mb-10">
+      <div>
+        <div class="inline-flex items-center gap-2 rounded-full bg-indigo-50 text-indigo-700 px-3 py-1.5 text-xs font-bold mb-5"><i class="fa-solid fa-circle-check"></i> SIMPLE · SECURE · TRANSPARENT</div>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight text-slate-900">Your loan status,<br><span class="text-indigo-600">without the guesswork.</span></h1>
+        <p class="mt-5 text-slate-500 leading-7 max-w-xl">Check your outstanding balance, review payment history, and find the currently configured payment accounts in one place.</p>
+        <div class="flex flex-wrap gap-5 mt-7 text-sm text-slate-500"><span><i class="fa-solid fa-lock text-emerald-500 mr-2"></i>Private lookup</span><span><i class="fa-solid fa-clock text-emerald-500 mr-2"></i>Live records</span><span><i class="fa-solid fa-mobile-screen text-emerald-500 mr-2"></i>Mobile friendly</span></div>
       </div>
-
-      <!-- STEP 2: CUSTOMER DASHBOARD -->
-      <div id="dashboardSection" class="hidden space-y-6">
-        <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-xl">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-6 mb-6">
-            <div>
-              <span class="inline-block px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-extrabold rounded-full mb-2">VERIFIED CUSTOMER</span>
-              <h2 id="custName" class="text-2xl sm:text-3xl font-extrabold text-white">---</h2>
-              <p class="text-slate-400 text-sm flex items-center gap-2 mt-1">
-                <span>Loan ID: <strong id="custLoanId" class="text-slate-200">---</strong></span>
-                <span>•</span>
-                <span>Code: <strong id="custCode" class="text-cyan-400">---</strong></span>
-              </p>
-            </div>
-            <button onclick="logout()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-2">
-              <i class="fa-solid fa-arrow-right-from-bracket"></i> Exit Portal
-            </button>
-          </div>
-
-          <!-- SUMMARY METRICS -->
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div class="p-4 bg-slate-900/60 rounded-2xl border border-slate-800">
-              <p class="text-xs text-slate-400 font-medium">Approved Amount</p>
-              <p id="totalLoanAmt" class="text-lg sm:text-xl font-extrabold text-white mt-1">Rs. 0</p>
-            </div>
-            <div class="p-4 bg-slate-900/60 rounded-2xl border border-slate-800">
-              <p class="text-xs text-slate-400 font-medium">Total Payable</p>
-              <p id="totalPayableAmt" class="text-lg sm:text-xl font-extrabold text-amber-400 mt-1">Rs. 0</p>
-            </div>
-            <div class="p-4 bg-emerald-950/30 rounded-2xl border border-emerald-800/40">
-              <p class="text-xs text-emerald-400 font-medium">Total Paid</p>
-              <p id="totalPaidAmt" class="text-lg sm:text-xl font-extrabold text-emerald-400 mt-1">Rs. 0</p>
-            </div>
-            <div class="p-4 bg-rose-950/30 rounded-2xl border border-rose-800/40">
-              <p class="text-xs text-rose-400 font-medium">Remaining Loan</p>
-              <p id="remainingAmt" class="text-lg sm:text-xl font-extrabold text-rose-400 mt-1">Rs. 0</p>
-            </div>
-          </div>
-
-          <!-- PROGRESS BAR -->
-          <div class="mt-6">
-            <div class="flex justify-between text-xs font-bold mb-2">
-              <span class="text-slate-400">Repayment Progress</span>
-              <span id="progressPercent" class="text-cyan-400">0%</span>
-            </div>
-            <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-800">
-              <div id="progressBar" class="h-full bg-gradient-to-r from-cyan-500 to-emerald-400 rounded-full transition-all duration-700" style="width: 0%"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- DETAILS & ACCOUNTS -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div class="glass-card rounded-3xl p-6 shadow-xl">
-            <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <i class="fa-solid fa-calendar-days text-cyan-400"></i> Key Dates
-            </h3>
-            <div class="space-y-3 text-sm">
-              <div class="flex justify-between py-2 border-b border-slate-800">
-                <span class="text-slate-400">Approval Date</span>
-                <span id="approvalDate" class="font-bold text-slate-200">---</span>
-              </div>
-              <div class="flex justify-between py-2 border-b border-slate-800">
-                <span class="text-slate-400">Next Payment Due</span>
-                <span id="nextDueDate" class="font-bold text-amber-400">---</span>
-              </div>
-              <div class="flex justify-between py-2">
-                <span class="text-slate-400">Status</span>
-                <span id="loanStatusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-black bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">ACTIVE</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="glass-card rounded-3xl p-6 shadow-xl border border-cyan-500/30 bg-gradient-to-b from-slate-900/90 to-slate-950">
-            <h3 class="text-sm font-bold text-cyan-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-              <i class="fa-solid fa-money-bill-transfer"></i> Payment Accounts
-            </h3>
-            <p class="text-xs text-slate-400 mb-4">Transfer payments directly to the designated accounts:</p>
-            
-            <div class="space-y-2 text-xs">
-              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
-                <span class="font-bold text-white">EasyPaisa:</span>
-                <span id="epNum" class="font-mono font-bold text-emerald-400 text-sm">---</span>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
-                <span class="font-bold text-white">JazzCash:</span>
-                <span id="jcNum" class="font-mono font-bold text-red-400 text-sm">---</span>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
-                <span class="font-bold text-white">SadaPay:</span>
-                <span id="spNum" class="font-mono font-bold text-teal-300 text-sm">---</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PAYMENT HISTORY TABLE -->
-        <div class="glass-card rounded-3xl p-6 shadow-xl">
-          <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-clock-rotate-left text-cyan-400"></i> Payment History
-          </h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider">
-                <tr>
-                  <th class="p-3 rounded-l-xl">#</th>
-                  <th class="p-3">Due Date</th>
-                  <th class="p-3">Amount</th>
-                  <th class="p-3">Paid Date</th>
-                  <th class="p-3 rounded-r-xl">Status</th>
-                </tr>
-              </thead>
-              <tbody id="paymentHistoryBody" class="divide-y divide-slate-800/60"></tbody>
-            </table>
-          </div>
+      <div class="relative">
+        <div class="absolute -inset-3 rounded-[2rem] bg-gradient-to-br from-indigo-200 to-cyan-100 blur-xl opacity-70"></div>
+        <div class="relative bg-white rounded-3xl p-6 sm:p-8 shadow-soft border border-slate-100">
+          <div class="flex items-center gap-3 mb-6"><div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-magnifying-glass-dollar text-xl"></i></div><div><h2 class="font-extrabold text-xl">Check your loan</h2><p class="text-sm text-slate-500">Enter the details shared with you.</p></div></div>
+          <form id="lookupForm" class="space-y-4">
+            <label class="block text-sm font-bold">6-digit passcode <span class="text-rose-500">*</span><input id="loanCodeInput" class="field mt-2" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" placeholder="Enter your 6-digit code"></label>
+            <button id="lookupButton" class="btn w-full bg-indigo-600 hover:bg-indigo-700 text-white" type="submit"><i class="fa-solid fa-arrow-right-to-bracket mr-2"></i>Check loan status</button>
+            <p class="text-xs text-slate-400 text-center">Your passcode is used to verify your loan record.</p>
+          </form>
+          <div id="lookupMessage" class="hidden mt-4 rounded-xl p-3 text-sm" role="status"></div>
         </div>
       </div>
+    </section>
 
-    </div>
+    <section id="loanResults" class="hidden-view space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3"><div><p class="text-xs uppercase tracking-[.18em] font-extrabold text-indigo-600">LOAN OVERVIEW</p><h2 id="customerName" class="text-2xl sm:text-3xl font-extrabold mt-2">Customer</h2><p id="loanMeta" class="text-sm text-slate-500 mt-1"></p></div><span id="loanStatusBadge" class="self-start rounded-full px-3 py-1.5 text-xs font-extrabold bg-emerald-50 text-emerald-700">ACTIVE</span></div>
+      <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm"><div class="text-sm text-slate-500">Approved amount</div><div id="approvedAmount" class="text-2xl font-extrabold mt-3">—</div><div class="text-xs text-slate-400 mt-2">Original loan principal</div></div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm"><div class="text-sm text-slate-500">Total payable</div><div id="payableAmount" class="text-2xl font-extrabold mt-3">—</div><div class="text-xs text-slate-400 mt-2">Agreed repayment amount</div></div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm"><div class="text-sm text-slate-500">Total paid</div><div id="totalPaid" class="text-2xl font-extrabold mt-3 text-emerald-600">—</div><div class="text-xs text-slate-400 mt-2">Payments recorded</div></div>
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm"><div class="text-sm text-slate-500">Remaining balance</div><div id="remainingBalance" class="text-2xl font-extrabold mt-3 text-indigo-600">—</div><div class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden"><div id="paidProgress" class="h-full bg-indigo-500 rounded-full" style="width:0%"></div></div><div id="progressLabel" class="text-xs text-slate-400 mt-2">0% repaid</div></div>
+      </div>
+      <div class="grid lg:grid-cols-[1.15fr_.85fr] gap-6">
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div class="p-5 border-b border-slate-100 flex items-center justify-between"><div><h3 class="font-extrabold">Payment history</h3><p class="text-sm text-slate-500 mt-1">Installments recorded against your loan</p></div><i class="fa-solid fa-receipt text-indigo-500 text-xl"></i></div>
+          <div class="table-wrap"><table class="w-full text-sm"><thead class="bg-slate-50 text-slate-500 text-xs uppercase"><tr><th class="text-left p-4">Date</th><th class="text-left p-4">Reference</th><th class="text-right p-4">Amount</th></tr></thead><tbody id="paymentHistoryBody"><tr><td colspan="3" class="p-6 text-center text-slate-400">No payments recorded.</td></tr></tbody></table></div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden"><div class="p-5 border-b border-slate-100"><h3 class="font-extrabold">Payment accounts</h3><p class="text-sm text-slate-500 mt-1">Use an active account to make a payment.</p></div><div id="customerPaymentAccounts" class="p-5 space-y-3"><p class="text-sm text-slate-400">Payment account details will appear here.</p></div><div class="m-5 mt-0 p-3 rounded-xl bg-amber-50 text-amber-800 text-xs leading-5"><i class="fa-solid fa-circle-info mr-1"></i> Always confirm payment details with the administrator before sending money. Payments are not automatically verified by this portal.</div></div>
+      </div>
+    </section>
+    <section class="grid sm:grid-cols-3 gap-4 mt-10">
+      <div class="rounded-2xl bg-white border border-slate-100 p-5"><i class="fa-solid fa-file-shield text-indigo-500 text-xl"></i><h3 class="font-bold mt-3">Clear records</h3><p class="text-sm text-slate-500 mt-2 leading-6">See the loan terms and payments currently registered for your account.</p></div>
+      <div class="rounded-2xl bg-white border border-slate-100 p-5"><i class="fa-solid fa-wallet text-indigo-500 text-xl"></i><h3 class="font-bold mt-3">Payment details</h3><p class="text-sm text-slate-500 mt-2 leading-6">View payment account information configured by the administrator.</p></div>
+      <div class="rounded-2xl bg-white border border-slate-100 p-5"><i class="fa-solid fa-headset text-indigo-500 text-xl"></i><h3 class="font-bold mt-3">Need help?</h3><p class="text-sm text-slate-500 mt-2 leading-6">Contact your loan administrator if any record or payment looks incorrect.</p></div>
+    </section>
   </main>
 
+  <!-- ADMIN VIEW -->
+  <main id="adminView" class="hidden-view max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <section id="adminLogin" class="max-w-md mx-auto my-8 sm:my-14 bg-white border border-slate-100 rounded-3xl p-7 sm:p-9 shadow-soft">
+      <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl"><i class="fa-solid fa-shield-halved"></i></div>
+      <p class="text-xs uppercase tracking-[.2em] text-indigo-600 font-extrabold mt-6">RESTRICTED ACCESS</p><h1 class="text-3xl font-extrabold mt-2">Admin sign in</h1><p class="text-sm text-slate-500 mt-3 leading-6">Sign in to manage loan records, payment history, and payment accounts.</p>
+      <form id="adminLoginForm" class="mt-6 space-y-4"><label class="block text-sm font-bold">Admin password<input id="adminPassword" class="field mt-2" type="password" required autocomplete="current-password" placeholder="Enter admin password"></label><button class="btn w-full bg-indigo-600 hover:bg-indigo-700 text-white" type="submit"><i class="fa-solid fa-lock-open mr-2"></i>Sign in</button><p id="adminLoginError" class="hidden text-sm text-rose-600" role="alert"></p></form>
+      <div class="mt-6 rounded-xl bg-amber-50 p-3 text-xs text-amber-800 leading-5"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Demo password gate only. For real deployments, use Firebase Authentication and restrictive Firestore Security Rules; a password embedded in client-side JavaScript is not secure.</div>
+    </section>
+
+    <section id="adminDashboard" class="hidden-view">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7"><div><p class="text-xs uppercase tracking-[.2em] text-indigo-600 font-extrabold">CONTROL CENTER</p><h1 class="text-3xl sm:text-4xl font-extrabold mt-2">Admin dashboard</h1><p class="text-slate-500 mt-2 text-sm">Manage customer loans and keep payment records up to date.</p></div><div class="flex gap-2"><button id="refreshAdmin" class="btn bg-white border border-slate-200 hover:bg-slate-50"><i class="fa-solid fa-rotate mr-2"></i>Refresh</button><button id="adminLogout" class="btn bg-slate-900 text-white hover:bg-slate-800"><i class="fa-solid fa-right-from-bracket mr-2"></i>Sign out</button></div></div>
+      <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-7">
+        <div class="bg-white border border-slate-100 rounded-2xl p-5"><div class="flex justify-between text-slate-500 text-sm"><span>Registered loans</span><i class="fa-solid fa-folder-open text-indigo-500"></i></div><div id="statLoans" class="text-3xl font-extrabold mt-3">0</div></div>
+        <div class="bg-white border border-slate-100 rounded-2xl p-5"><div class="flex justify-between text-slate-500 text-sm"><span>Total payable</span><i class="fa-solid fa-coins text-indigo-500"></i></div><div id="statPayable" class="text-3xl font-extrabold mt-3">Rs 0</div></div>
+        <div class="bg-white border border-slate-100 rounded-2xl p-5"><div class="flex justify-between text-slate-500 text-sm"><span>Total collected</span><i class="fa-solid fa-arrow-trend-up text-emerald-500"></i></div><div id="statPaid" class="text-3xl font-extrabold mt-3 text-emerald-600">Rs 0</div></div>
+        <div class="bg-white border border-slate-100 rounded-2xl p-5"><div class="flex justify-between text-slate-500 text-sm"><span>Outstanding</span><i class="fa-solid fa-hourglass-half text-amber-500"></i></div><div id="statOutstanding" class="text-3xl font-extrabold mt-3 text-amber-600">Rs 0</div></div>
+      </div>
+
+      <div class="grid xl:grid-cols-[.95fr_1.05fr] gap-6 mb-6">
+        <section class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden"><div class="p-5 border-b border-slate-100"><h2 class="font-extrabold text-lg"><i class="fa-solid fa-file-circle-plus text-indigo-500 mr-2"></i>Create loan record</h2><p class="text-sm text-slate-500 mt-1">Create a new customer loan and generate a loan ID.</p></div>
+          <form id="createLoanForm" class="p-5 grid sm:grid-cols-2 gap-4">
+            <label class="block text-sm font-bold sm:col-span-2">Customer name<input id="newCustomerName" class="field mt-2" required maxlength="120" placeholder="Full name"></label>
+            <label class="block text-sm font-bold">6-digit passcode<input id="newLoanCode" class="field mt-2" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="e.g. 482105"></label>
+            <label class="block text-sm font-bold">Loan ID <span class="text-slate-400 font-normal">(optional)</span><input id="newLoanId" class="field mt-2" maxlength="40" placeholder="Auto-generate if blank"></label>
+            <label class="block text-sm font-bold">Approved amount (Rs)<input id="newApproved" class="field mt-2" type="number" min="0.01" step="0.01" required placeholder="50000"></label>
+            <label class="block text-sm font-bold">Total payable (Rs)<input id="newPayable" class="field mt-2" type="number" min="0.01" step="0.01" required placeholder="60000"></label>
+            <label class="block text-sm font-bold">Approval date<input id="newApprovalDate" class="field mt-2" type="date" required></label>
+            <label class="block text-sm font-bold">Due date<input id="newDueDate" class="field mt-2" type="date" required></label>
+            <div class="sm:col-span-2"><button id="createLoanButton" class="btn bg-indigo-600 hover:bg-indigo-700 text-white w-full" type="submit"><i class="fa-solid fa-plus mr-2"></i>Create loan</button></div>
+          </form>
+        </section>
+
+        <section class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden"><div class="p-5 border-b border-slate-100"><h2 class="font-extrabold text-lg"><i class="fa-solid fa-wallet text-indigo-500 mr-2"></i>Payment account configuration</h2><p class="text-sm text-slate-500 mt-1">These details are displayed to customers after a successful lookup.</p></div>
+          <form id="settingsForm" class="p-5 space-y-4">
+            <div class="grid sm:grid-cols-3 gap-3">
+              <label class="block text-sm font-bold">EasyPaisa number<input id="easypaisaNumber" class="field mt-2" maxlength="40" placeholder="03xx-xxxxxxx"></label>
+              <label class="block text-sm font-bold">JazzCash number<input id="jazzcashNumber" class="field mt-2" maxlength="40" placeholder="03xx-xxxxxxx"></label>
+              <label class="block text-sm font-bold">SadaPay number<input id="sadapayNumber" class="field mt-2" maxlength="40" placeholder="Account / IBAN"></label>
+            </div>
+            <div class="grid sm:grid-cols-3 gap-3">
+              <label class="flex items-center gap-2 text-sm font-semibold rounded-xl bg-slate-50 p-3"><input id="easypaisaActive" type="checkbox" class="accent-indigo-600"> EasyPaisa active</label>
+              <label class="flex items-center gap-2 text-sm font-semibold rounded-xl bg-slate-50 p-3"><input id="jazzcashActive" type="checkbox" class="accent-indigo-600"> JazzCash active</label>
+              <label class="flex items-center gap-2 text-sm font-semibold rounded-xl bg-slate-50 p-3"><input id="sadapayActive" type="checkbox" class="accent-indigo-600"> SadaPay active</label>
+            </div>
+            <button class="btn bg-slate-900 hover:bg-slate-800 text-white w-full" type="submit"><i class="fa-solid fa-floppy-disk mr-2"></i>Save payment settings</button>
+          </form>
+        </section>
+      </div>
+
+      <section class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden mb-6"><div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><h2 class="font-extrabold text-lg">Registered loans</h2><p class="text-sm text-slate-500 mt-1">Add a payment or remove a record.</p></div><div class="relative"><i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-400 text-sm"></i><input id="loanSearch" class="field pl-9 sm:w-72" placeholder="Search name or loan ID"></div></div>
+        <div class="table-wrap"><table class="w-full text-sm"><thead class="bg-slate-50 text-slate-500 text-xs uppercase"><tr><th class="text-left p-4">Customer / Loan ID</th><th class="text-left p-4">Due date</th><th class="text-right p-4">Payable</th><th class="text-right p-4">Paid</th><th class="text-right p-4">Balance</th><th class="text-right p-4">Actions</th></tr></thead><tbody id="adminLoansBody"><tr><td colspan="6" class="p-8 text-center text-slate-400">Sign in to load records.</td></tr></tbody></table></div>
+      </section>
+
+      <section class="bg-[#101827] text-slate-200 rounded-2xl overflow-hidden shadow-soft"><div class="p-5 border-b border-slate-700 flex items-center justify-between gap-3"><div><h2 class="font-extrabold"><i class="fa-solid fa-terminal text-emerald-400 mr-2"></i>Live diagnostic console</h2><p class="text-xs text-slate-400 mt-1">Connection state, operation events, and error traces</p></div><button id="clearLogs" class="text-xs font-bold px-3 py-2 rounded-lg bg-slate-700 hover:bg-slate-600">Clear logs</button></div><div class="px-5 py-3 flex flex-wrap gap-x-5 gap-y-2 text-xs border-b border-slate-700"><span>NETWORK: <b id="networkState" class="text-emerald-300">ONLINE</b></span><span>FIRESTORE: <b id="firestoreState" class="text-amber-300">INITIALIZING</b></span><span>LAST ERROR: <b id="lastErrorCode" class="text-slate-400">NONE</b></span></div><div id="diagnosticLog" class="p-5 h-56 overflow-y-auto"><div class="console-line text-slate-400">Waiting for events…</div></div></section>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-200 mt-12 bg-white"><div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row justify-between gap-2 text-xs text-slate-400"><span>© <span id="year"></span> LoanCheck Portal</span><span>Loan information is provided for reference. Confirm discrepancies with your administrator.</span></div></footer>
+
+  <!-- Firebase v9 compat SDKs. Replace the configuration below with your Firebase project's web app config. -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
   <script>
-    // FIREBASE INITIALIZATION
+    "use strict";
+
+    // IMPORTANT: Configure Firebase in the Firebase Console. Never rely on this UI password
+    // as security. Use Firebase Authentication + Firestore Security Rules in production.
     const firebaseConfig = {
       apiKey: "AIzaSyAJt6q0qq0w2wy-MxhNXuRvL4MaDvPhLTQ",
       authDomain: "loansystem-6b088.firebaseapp.com",
@@ -218,103 +167,351 @@
       appId: "1:734622223465:web:1f5b49334d6ae50cada6f8"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const ADMIN_PASSWORD = "admin100"; // Demo-only gate; not secure against inspection.
+    const SETTINGS_DOC = "paymentAccounts";
+    const $ = (id) => document.getElementById(id);
+    const isAdminPage = /admin\.html$/i.test(location.pathname) || new URLSearchParams(location.search).get("view") === "admin";
+    let db = null;
+    let adminUnlocked = sessionStorage.getItem("loancheck_admin_unlocked") === "yes";
+    let loansCache = [];
+    let settingsCache = {};
+    let logCounter = 0;
 
-    async function handleVerification(e) {
-      e.preventDefault();
-      const inputCode = document.getElementById('loanCodeInput').value.trim();
-      const errorDiv = document.getElementById('errorMessage');
-      const verifyBtn = document.getElementById('verifyBtn');
-
-      verifyBtn.innerText = "Checking Cloud...";
-
+    const money = (value) => "Rs " + Number(value || 0).toLocaleString("en-PK", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+    const getPaid = (loan) => (Array.isArray(loan.payments) ? loan.payments : []).reduce((sum, p) => sum + Math.max(0, Number(p.amount) || 0), 0);
+    const getBalance = (loan) => Math.max(0, Number(loan.payableAmount || 0) - getPaid(loan));
+    const formatDate = (value) => {
+      if (!value) return "—";
+      if (typeof value === "string") return value;
+      if (value.toDate) return value.toDate().toLocaleDateString();
+      return new Date(value).toLocaleDateString();
+    };
+    function logEvent(level, message, detail = "") {
+      const time = new Date().toLocaleTimeString();
+      const box = $("diagnosticLog");
+      if (!box) return;
+      if (logCounter === 0) box.innerHTML = "";
+      logCounter++;
+      const color = level === "ERROR" ? "text-rose-300" : level === "WARN" ? "text-amber-300" : level === "OK" ? "text-emerald-300" : "text-slate-300";
+      const line = document.createElement("div");
+      line.className = "console-line " + color;
+      line.textContent = `[${time}] [${level}] ${message}${detail ? " — " + detail : ""}`;
+      box.appendChild(line);
+      box.scrollTop = box.scrollHeight;
+      if (level === "ERROR") $("lastErrorCode").textContent = detail || "UNKNOWN";
+    }
+    function setFirestoreStatus(ok, label) {
+      $("firestoreState").textContent = label || (ok ? "CONNECTED" : "ERROR");
+      $("firestoreState").className = ok ? "text-emerald-300" : "text-rose-300";
+    }
+    function setConnection(online) {
+      $("connectionText").textContent = online ? "Online" : "Offline";
+      $("connectionPill").innerHTML = `<span class="status-dot ${online ? "bg-emerald-400" : "bg-rose-400"}"></span><span>${online ? "Online" : "Offline"}</span>`;
+      const net = $("networkState");
+      if (net) { net.textContent = online ? "ONLINE" : "OFFLINE"; net.className = online ? "text-emerald-300" : "text-rose-300"; }
+    }
+    function showMessage(el, text, good = false) {
+      el.classList.remove("hidden", "bg-rose-50", "text-rose-700", "bg-emerald-50", "text-emerald-700");
+      el.classList.add(good ? "bg-emerald-50" : "bg-rose-50", good ? "text-emerald-700" : "text-rose-700");
+      el.textContent = text;
+    }
+    function firebaseConfigured() {
+      return firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY" &&
+             firebaseConfig.projectId !== "YOUR_PROJECT_ID" &&
+             firebaseConfig.appId !== "YOUR_FIREBASE_APP_ID";
+    }
+    function initializeFirebase() {
+      if (!firebaseConfigured()) {
+        setFirestoreStatus(false, "CONFIG REQUIRED");
+        logEvent("WARN", "Firebase not configured", "Edit firebaseConfig in this HTML file");
+        return false;
+      }
       try {
-        const querySnapshot = await db.collection('loans').where('code', '==', inputCode).get();
-        
-        if (!querySnapshot.empty) {
-          const loanData = querySnapshot.docs[0].data();
-          errorDiv.classList.add('hidden');
-          renderDashboard(loanData);
-        } else {
-          errorDiv.classList.remove('hidden');
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        setFirestoreStatus(true, "SDK READY");
+        logEvent("OK", "Firebase SDK initialized", firebaseConfig.projectId);
+        return true;
+      } catch (error) {
+        setFirestoreStatus(false, "INIT ERROR");
+        logEvent("ERROR", "Firebase initialization failed", error.code || error.message);
+        return false;
+      }
+    }
+    function requireDb() {
+      if (!db) throw new Error("Firebase is not configured. Add your Firebase web app settings to firebaseConfig.");
+      if (!navigator.onLine) throw new Error("Network offline. Check your internet connection.");
+      return db;
+    }
+    function displayAccounts(settings, targetId) {
+      const target = $(targetId);
+      const accounts = [
+        ["EasyPaisa", "easypaisa", "fa-mobile-screen-button"],
+        ["JazzCash", "jazzcash", "fa-wallet"],
+        ["SadaPay", "sadapay", "fa-building-columns"]
+      ];
+      const active = accounts.filter(([, key]) => settings[key + "Active"] && String(settings[key + "Number"] || "").trim());
+      if (!active.length) {
+        target.innerHTML = '<p class="text-sm text-slate-400">No active payment accounts have been configured.</p>';
+        return;
+      }
+      target.innerHTML = active.map(([name, key, icon]) => `<div class="flex items-center gap-3 rounded-xl border border-slate-100 p-3"><div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fa-solid ${icon}"></i></div><div class="min-w-0 flex-1"><div class="font-bold text-sm">${name}</div><div class="text-sm text-slate-500 break-all">${escapeHtml(settings[key + "Number"])}</div></div><button class="copy-account text-xs font-bold text-indigo-600 hover:text-indigo-800" data-copy="${escapeHtml(settings[key + "Number"])}" title="Copy number"><i class="fa-regular fa-copy"></i></button></div>`).join("");
+      target.querySelectorAll(".copy-account").forEach((button) => button.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(button.dataset.copy); button.innerHTML = '<i class="fa-solid fa-check"></i>'; }
+        catch (_) { alert("Please copy this account number manually: " + button.dataset.copy); }
+      }));
+    }
+    async function lookupLoan(event) {
+      event.preventDefault();
+      const code = $("loanCodeInput").value.trim();
+      const message = $("lookupMessage");
+      $("loanResults").classList.add("hidden-view");
+      if (!/^\d{6}$/.test(code)) return showMessage(message, "Please enter a valid 6-digit passcode.");
+      $("lookupButton").disabled = true;
+      $("lookupButton").innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Checking…';
+      try {
+        const database = requireDb();
+        // Lookup by the six-digit code only. For production, replace this with a trusted
+        // backend endpoint so customer passcodes are not queried directly from the browser.
+        const matches = await database.collection("loans").where("code", "==", code).limit(2).get();
+        if (matches.empty) {
+          logEvent("WARN", "Loan lookup rejected", "CODE_NOT_FOUND");
+          return showMessage(message, "We couldn't find a loan for that passcode. Please check the code.");
         }
-      } catch (err) {
-        console.error(err);
-        errorDiv.classList.remove('hidden');
+        if (matches.size > 1) {
+          logEvent("WARN", "Loan lookup ambiguous", "DUPLICATE_CODE");
+          return showMessage(message, "This passcode matches more than one record. Please contact the administrator.");
+        }
+        const doc = matches.docs[0];
+        const loan = { id: doc.id, ...doc.data() };
+        renderCustomerLoan(loan);
+        let settings = {};
+        try {
+          const settingsDoc = await database.collection("settings").doc(SETTINGS_DOC).get();
+          if (settingsDoc.exists) settings = settingsDoc.data();
+        } catch (e) { logEvent("WARN", "Could not load payment accounts", e.code || e.message); }
+        displayAccounts(settings, "customerPaymentAccounts");
+        $("loanResults").classList.remove("hidden-view");
+        message.classList.add("hidden");
+        logEvent("OK", "Customer loan lookup succeeded", loan.id);
+        setFirestoreStatus(true, "CONNECTED");
+      } catch (error) {
+        logEvent("ERROR", "Loan lookup failed", error.code || error.message);
+        showMessage(message, error.message || "Unable to look up your loan. Please try again.");
       } finally {
-        verifyBtn.innerText = "CHECK LOAN STATUS";
+        $("lookupButton").disabled = false;
+        $("lookupButton").innerHTML = '<i class="fa-solid fa-arrow-right-to-bracket mr-2"></i>Check loan status';
       }
     }
-
-    async function renderDashboard(loan) {
-      document.getElementById('verifySection').classList.add('hidden');
-      document.getElementById('dashboardSection').classList.remove('hidden');
-
-      document.getElementById('custName').innerText = loan.customerName;
-      document.getElementById('custLoanId').innerText = loan.loanId;
-      document.getElementById('custCode').innerText = loan.code;
-
-      const remaining = (loan.payableAmount || 0) - (loan.paidAmount || 0);
-      const progress = loan.payableAmount ? Math.min(100, Math.round((loan.paidAmount / loan.payableAmount) * 100)) : 0;
-
-      document.getElementById('totalLoanAmt').innerText = 'Rs. ' + (loan.totalLoan || 0).toLocaleString();
-      document.getElementById('totalPayableAmt').innerText = 'Rs. ' + (loan.payableAmount || 0).toLocaleString();
-      document.getElementById('totalPaidAmt').innerText = 'Rs. ' + (loan.paidAmount || 0).toLocaleString();
-      document.getElementById('remainingAmt').innerText = 'Rs. ' + remaining.toLocaleString();
-      
-      document.getElementById('progressPercent').innerText = progress + '%';
-      document.getElementById('progressBar').style.width = progress + '%';
-
-      document.getElementById('approvalDate').innerText = loan.approvalDate || '---';
-      document.getElementById('nextDueDate').innerText = loan.nextDueDate || '---';
-      document.getElementById('loanStatusBadge').innerText = (loan.status || 'Active').toUpperCase();
-
-      // Fetch admin accounts from Firebase
+    function renderCustomerLoan(loan) {
+      const paid = getPaid(loan), balance = getBalance(loan);
+      const payable = Number(loan.payableAmount || 0);
+      const progress = payable > 0 ? Math.min(100, Math.round(paid / payable * 100)) : 0;
+      $("customerName").textContent = loan.customerName || "Customer";
+      $("loanMeta").textContent = `Loan ID: ${loan.id} · Approved ${formatDate(loan.approvalDate)} · Due ${formatDate(loan.dueDate)}`;
+      $("approvedAmount").textContent = money(loan.approvedAmount);
+      $("payableAmount").textContent = money(payable);
+      $("totalPaid").textContent = money(paid);
+      $("remainingBalance").textContent = money(balance);
+      $("paidProgress").style.width = progress + "%";
+      $("progressLabel").textContent = progress + "% repaid";
+      $("loanStatusBadge").textContent = balance <= 0 ? "PAID IN FULL" : (loan.status || "ACTIVE").toUpperCase();
+      $("loanStatusBadge").className = "self-start rounded-full px-3 py-1.5 text-xs font-extrabold " + (balance <= 0 ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-700");
+      const payments = Array.isArray(loan.payments) ? [...loan.payments].sort((a,b) => String(b.date || "").localeCompare(String(a.date || ""))) : [];
+      $("paymentHistoryBody").innerHTML = payments.length ? payments.map(p => `<tr class="border-t border-slate-100"><td class="p-4 whitespace-nowrap">${escapeHtml(formatDate(p.date))}</td><td class="p-4">${escapeHtml(p.reference || "Installment")}</td><td class="p-4 text-right font-bold text-emerald-600">${escapeHtml(money(p.amount))}</td></tr>`).join("") : '<tr><td colspan="3" class="p-6 text-center text-slate-400">No payments recorded yet.</td></tr>';
+    }
+    async function adminSignIn(event) {
+      event.preventDefault();
+      if ($("adminPassword").value !== ADMIN_PASSWORD) {
+        $("adminLoginError").textContent = "Incorrect password. Please try again.";
+        $("adminLoginError").classList.remove("hidden");
+        logEvent("WARN", "Admin sign-in rejected", "INVALID_PASSWORD");
+        return;
+      }
+      adminUnlocked = true;
+      sessionStorage.setItem("loancheck_admin_unlocked", "yes");
+      $("adminLoginError").classList.add("hidden");
+      showAdminDashboard();
+      logEvent("OK", "Admin demo gate passed", "SESSION_STORAGE");
+      await loadAdminData();
+    }
+    function showAdminDashboard() {
+      $("adminLogin").classList.add("hidden-view");
+      $("adminDashboard").classList.remove("hidden-view");
+    }
+    function signOutAdmin() {
+      adminUnlocked = false;
+      sessionStorage.removeItem("loancheck_admin_unlocked");
+      $("adminDashboard").classList.add("hidden-view");
+      $("adminLogin").classList.remove("hidden-view");
+      $("adminPassword").value = "";
+      logEvent("INFO", "Admin signed out");
+    }
+    async function loadAdminData() {
       try {
-        const accDoc = await db.collection('settings').doc('accounts').get();
-        if (accDoc.exists) {
-          const acc = accDoc.data();
-          document.getElementById('epNum').innerText = acc.easypaisa || 'N/A';
-          document.getElementById('jcNum').innerText = acc.jazzcash || 'N/A';
-          document.getElementById('spNum').innerText = acc.sadapay || 'N/A';
-        }
-      } catch (e) {
-        console.error(e);
+        const database = requireDb();
+        const [loanSnapshot, settingsSnapshot] = await Promise.all([
+          database.collection("loans").get(),
+          database.collection("settings").doc(SETTINGS_DOC).get()
+        ]);
+        loansCache = loanSnapshot.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => String(a.customerName || "").localeCompare(String(b.customerName || "")));
+        settingsCache = settingsSnapshot.exists ? settingsSnapshot.data() : {};
+        populateSettingsForm(settingsCache);
+        renderAdminLoans();
+        updateStats();
+        setFirestoreStatus(true, "CONNECTED");
+        logEvent("OK", "Admin data loaded", `${loansCache.length} loan record(s)`);
+      } catch (error) {
+        setFirestoreStatus(false, "READ ERROR");
+        logEvent("ERROR", "Could not load admin data", error.code || error.message);
+        alert("Could not load admin data: " + error.message + "\nCheck Firebase config and Firestore rules.");
       }
-
-      // Render installments
-      const tbody = document.getElementById('paymentHistoryBody');
-      tbody.innerHTML = '';
-
-      if (loan.installments && loan.installments.length > 0) {
-        loan.installments.forEach(inst => {
-          const isPaid = inst.status === 'PAID';
-          const row = `
-            <tr class="hover:bg-slate-900/40">
-              <td class="p-3 font-mono font-bold text-slate-400">#${inst.num}</td>
-              <td class="p-3 font-semibold text-slate-200">${inst.dueDate}</td>
-              <td class="p-3 font-bold text-amber-400">Rs. ${(inst.amount || 0).toLocaleString()}</td>
-              <td class="p-3 text-slate-400">${inst.paidDate || '-'}</td>
-              <td class="p-3">
-                <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold ${isPaid ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
-                  ${inst.status}
-                </span>
-              </td>
-            </tr>
-          `;
-          tbody.innerHTML += row;
+    }
+    function populateSettingsForm(s) {
+      ["easypaisa","jazzcash","sadapay"].forEach(key => {
+        $(key + "Number").value = s[key + "Number"] || "";
+        $(key + "Active").checked = Boolean(s[key + "Active"]);
+      });
+    }
+    function updateStats() {
+      const payable = loansCache.reduce((s,l) => s + Number(l.payableAmount || 0), 0);
+      const paid = loansCache.reduce((s,l) => s + getPaid(l), 0);
+      $("statLoans").textContent = loansCache.length;
+      $("statPayable").textContent = money(payable);
+      $("statPaid").textContent = money(paid);
+      $("statOutstanding").textContent = money(Math.max(0, payable - paid));
+    }
+    function renderAdminLoans() {
+      const filter = $("loanSearch").value.trim().toLowerCase();
+      const rows = loansCache.filter(l => `${l.customerName || ""} ${l.id}`.toLowerCase().includes(filter));
+      $("adminLoansBody").innerHTML = rows.length ? rows.map(l => {
+        const paid = getPaid(l), balance = getBalance(l);
+        return `<tr class="border-t border-slate-100 hover:bg-slate-50/70"><td class="p-4"><div class="font-bold">${escapeHtml(l.customerName || "Unnamed")}</div><div class="text-xs text-slate-400 mt-1">${escapeHtml(l.id)}</div></td><td class="p-4 whitespace-nowrap">${escapeHtml(formatDate(l.dueDate))}</td><td class="p-4 text-right">${escapeHtml(money(l.payableAmount))}</td><td class="p-4 text-right text-emerald-600 font-bold">${escapeHtml(money(paid))}</td><td class="p-4 text-right font-bold">${escapeHtml(money(balance))}</td><td class="p-4"><div class="flex justify-end gap-2"><button data-action="payment" data-id="${escapeHtml(l.id)}" class="btn !px-3 !py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-xs whitespace-nowrap"><i class="fa-solid fa-plus mr-1"></i>Payment</button><button data-action="delete" data-id="${escapeHtml(l.id)}" class="btn !px-3 !py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 text-xs" title="Delete loan"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
+      }).join("") : '<tr><td colspan="6" class="p-8 text-center text-slate-400">No matching loan records.</td></tr>';
+      $("adminLoansBody").querySelectorAll("button[data-action]").forEach(btn => btn.addEventListener("click", () => {
+        if (btn.dataset.action === "payment") addPayment(btn.dataset.id);
+        if (btn.dataset.action === "delete") deleteLoan(btn.dataset.id);
+      }));
+    }
+    async function createLoan(event) {
+      event.preventDefault();
+      try {
+        const database = requireDb();
+        const name = $("newCustomerName").value.trim(), code = $("newLoanCode").value.trim();
+        const approved = Number($("newApproved").value), payable = Number($("newPayable").value);
+        const approvalDate = $("newApprovalDate").value, dueDate = $("newDueDate").value;
+        if (!name || !/^\d{6}$/.test(code)) throw new Error("Enter a customer name and a valid 6-digit passcode.");
+        if (!(approved > 0) || !(payable > 0) || payable < approved) throw new Error("Amounts must be positive and total payable must be at least the approved amount.");
+        if (!approvalDate || !dueDate || dueDate < approvalDate) throw new Error("Please enter valid dates; due date must be on or after approval date.");
+        const requestedId = $("newLoanId").value.trim();
+        const docRef = requestedId ? database.collection("loans").doc(requestedId) : database.collection("loans").doc();
+        if (requestedId && (await docRef.get()).exists) throw new Error("That Loan ID already exists. Choose a different ID.");
+        const loanId = requestedId || ("LC-" + docRef.id.slice(0, 8).toUpperCase());
+        const finalRef = requestedId ? docRef : database.collection("loans").doc(loanId);
+        if (!requestedId && (await finalRef.get()).exists) throw new Error("Generated Loan ID collision. Please submit again.");
+        await finalRef.set({
+          customerName: name, code, approvedAmount: approved, payableAmount: payable,
+          approvalDate, dueDate, payments: [], status: "active",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-      } else {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No installments recorded yet.</td></tr>`;
+        logEvent("OK", "Loan record created", loanId);
+        $("createLoanForm").reset();
+        $("newApprovalDate").value = new Date().toISOString().slice(0,10);
+        await loadAdminData();
+        alert("Loan created successfully.\nLoan ID: " + loanId + "\nShare this ID and the 6-digit passcode with the customer securely.");
+      } catch (error) {
+        logEvent("ERROR", "Loan creation failed", error.code || error.message);
+        alert("Could not create loan: " + error.message);
+      }
+    }
+    async function addPayment(id) {
+      const loan = loansCache.find(l => l.id === id);
+      if (!loan) return;
+      const amountText = prompt(`Record a payment for ${loan.customerName} (${id}).\nRemaining balance: ${money(getBalance(loan))}\nEnter amount in Rs:`);
+      if (amountText === null) return;
+      const amount = Number(amountText);
+      if (!Number.isFinite(amount) || amount <= 0) return alert("Enter a valid payment amount greater than zero.");
+      if (amount > getBalance(loan) + 0.0001 && !confirm("This payment exceeds the remaining balance. Record it anyway?")) return;
+      const reference = prompt("Payment reference / note (optional):", "Installment") ?? "Installment";
+      const payment = { amount, date: new Date().toISOString().slice(0,10), reference: reference.trim().slice(0,100), recordedAt: new Date().toISOString() };
+      try {
+        // Transaction avoids overwriting a payment if two admins update the same loan at once.
+        await requireDb().runTransaction(async tx => {
+          const ref = requireDb().collection("loans").doc(id);
+          const snap = await tx.get(ref);
+          if (!snap.exists) throw new Error("Loan record no longer exists.");
+          const data = snap.data();
+          const payments = Array.isArray(data.payments) ? data.payments : [];
+          tx.update(ref, { payments: [...payments, payment], updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        });
+        logEvent("OK", "Payment recorded", `${id} · ${money(amount)}`);
+        await loadAdminData();
+      } catch (error) {
+        logEvent("ERROR", "Payment recording failed", error.code || error.message);
+        alert("Could not record payment: " + error.message);
+      }
+    }
+    async function deleteLoan(id) {
+      const loan = loansCache.find(l => l.id === id);
+      if (!loan || !confirm(`Delete loan "${loan.customerName}" (${id}) and its payment history? This cannot be undone.`)) return;
+      try {
+        await requireDb().collection("loans").doc(id).delete();
+        logEvent("WARN", "Loan record deleted", id);
+        await loadAdminData();
+      } catch (error) {
+        logEvent("ERROR", "Loan deletion failed", error.code || error.message);
+        alert("Could not delete loan: " + error.message);
+      }
+    }
+    async function saveSettings(event) {
+      event.preventDefault();
+      try {
+        const settings = {};
+        ["easypaisa","jazzcash","sadapay"].forEach(key => {
+          settings[key + "Number"] = $(key + "Number").value.trim();
+          settings[key + "Active"] = $(key + "Active").checked;
+        });
+        settings.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+        await requireDb().collection("settings").doc(SETTINGS_DOC).set(settings, { merge: true });
+        settingsCache = settings;
+        logEvent("OK", "Payment settings saved", "settings/" + SETTINGS_DOC);
+        alert("Payment settings saved.");
+      } catch (error) {
+        logEvent("ERROR", "Saving payment settings failed", error.code || error.message);
+        alert("Could not save payment settings: " + error.message);
       }
     }
 
-    function logout() {
-      document.getElementById('dashboardSection').classList.add('hidden');
-      document.getElementById('verifySection').classList.remove('hidden');
-      document.getElementById('loanCodeInput').value = '';
-    }
+    document.addEventListener("DOMContentLoaded", () => {
+      $("year").textContent = new Date().getFullYear();
+      $("newApprovalDate").value = new Date().toISOString().slice(0,10);
+      setConnection(navigator.onLine);
+      window.addEventListener("online", () => { setConnection(true); logEvent("OK", "Network restored"); });
+      window.addEventListener("offline", () => { setConnection(false); logEvent("WARN", "Network disconnected", "OFFLINE"); });
+      const ready = initializeFirebase();
+
+      if (isAdminPage) {
+        $("customerView").classList.add("hidden-view");
+        $("adminView").classList.remove("hidden-view");
+        $("adminLink").classList.add("hidden-view");
+        if (adminUnlocked) { showAdminDashboard(); if (ready) loadAdminData(); }
+        $("adminLoginForm").addEventListener("submit", adminSignIn);
+        $("adminLogout").addEventListener("click", signOutAdmin);
+        $("createLoanForm").addEventListener("submit", createLoan);
+        $("settingsForm").addEventListener("submit", saveSettings);
+        $("refreshAdmin").addEventListener("click", loadAdminData);
+        $("loanSearch").addEventListener("input", renderAdminLoans);
+        $("clearLogs").addEventListener("click", () => { $("diagnosticLog").innerHTML = ""; logCounter = 0; logEvent("INFO", "Console cleared"); });
+      } else {
+        $("customerLink").classList.add("hidden-view");
+        $("lookupForm").addEventListener("submit", lookupLoan);
+      }
+      if (!ready) {
+        const msg = isAdminPage ? "Firebase configuration is required before admin actions can work." : "Portal setup is incomplete. Firebase configuration is required before checking loans.";
+        logEvent("WARN", msg);
+      }
+    });
   </script>
 </body>
 </html>
